@@ -24,6 +24,13 @@ class Pos {
 		"salesAttendantPerformance", "topCustomersPerformance"
 	];
 
+	public $APIEndpoints = [
+		'inventoryManagement' => "/api/inventoryManagement/getAllProducts, /api/inventoryManagement/updateWareHouseStock, 
+			/api/inventoryManagement/transferProductQuantity, /api/inventoryManagement/bulkTransferProducts endpoints",
+		'stockUpdates' => "/api/inventoryManagement/updateWareHouseStock, /api/inventoryManagement/transferProductQuantity, 
+			/api/inventoryManagement/bulkTransferProducts endpoints",
+	];
+
 	public function __construct() {
 
 		global $pos, $session, $config;
