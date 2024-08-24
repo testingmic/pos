@@ -360,7 +360,7 @@ if ( ! function_exists('confirm_url_id')) {
 			# return true / false using the tenary mode of comparison
 			# if the $str was not provided
 			if(!$str) {
-				return (isset($SITEURL[$int])) ? true : false;
+				return isset($SITEURL[$int]) ? $SITEURL[$int] : false;
 			} else {
 				# run a double comparison if both $int and $str were supplied
 				if(isset($SITEURL[$int]) and strlen($str) > 0) {

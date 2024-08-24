@@ -88,11 +88,8 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 	$branchAccessInner = '';
 	$accessLimit = '';
 	$accessLimitInner = '';
-	$customerLimit = '';
-	$customerLimitInner = '';
 	$accessLimitInner2 = '';
 	$branchAccess2 = '';
-	$customerLimitInner2 = '';
 	$clientAccess = " AND a.clientId = '{$loggedUserClientId}'";
 	$clientAccessInner = " AND b.clientId = '{$loggedUserClientId}'";
 
@@ -106,32 +103,20 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 		$accessLimitInner2 = " AND c.recorded_by = '{$loggedUserId}'";
 	}
 
-	//: if the customer id is set
-	if(!empty($session->reportingCustomerId)) {
-		$customerLimit = " AND a.customer_id = '{$session->reportingCustomerId}'";
-		$customerLimitInner = " AND b.customer_id = '{$session->reportingCustomerId}'";
-		$customerLimitInner2 = " AND c.customer_id = '{$session->reportingCustomerId}'";
-	}
-
 	//: dashboard inights
-	if(confirm_url_id(1, 'dashboardAnalytics')) {
+	if(confirm_url_id(1, 'dashboardAnalytics') || confirm_url_id(1, 'reportsAnalytics')) {
 		
-		
-
-	}
-
-	//: reporting
-	elseif(confirm_url_id(1, 'reportsAnalytics')) {
-	 
+		// create object for report
 		$handlerObject = load_class('Reports', 'controllers');
 
 		// set some additional variables
 		$handlerObject->dateClass = $dateClass;
+		$handlerObject->accessObject = $accessObject;
 		$handlerObject->insightRequest = $insightRequest;
 		$handlerObject->apiAccessValues = $apiAccessValues;
-
+		
 		// process the request
-		$response = $handlerObject->reportsAnalytics($clientData, $accessObject, $setupInfo, $expiredAccount);
+		$response = $handlerObject->{confirm_url_id(1)}($clientData, $setupInfo, $expiredAccount, confirm_url_id(2));
 
 	}
 
