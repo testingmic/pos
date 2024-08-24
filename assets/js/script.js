@@ -100,6 +100,7 @@ function listIDB(sN) {
 }
 
 function upIDB(sN, obDet) {
+    return true;
     return new Promise((resolve, reject) => {
         var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB
         var open = indexedDB.open(iName, iVer);
@@ -1454,12 +1455,18 @@ var populateUserDetails = (data) => {
     $(`[name="gender"]`).val(data.gender).change();
     $(`[name="phone"]`).val(data.contact);
     $(`[name="email"]`).val(data.email);
-    $(`[name="branchId"]`).val(data.branchId).change();
     $(`[name="userId"]`).val(data.user_id);
     $(`[name="record_type"]`).val("update-record");
     $(`[name="weekly_target"]`).val(data.weekly_target);
     $(`[name="daily_target"]`).val(data.daily_target);
     $(`[name="monthly_target"]`).val(data.monthly_target);
+
+    $(`select[id="branchId"][name="branchId[]"]`).find('option').remove().end();
+
+    $.each(data.branchesList, function(key, value) {
+        $(`select[id="branchId"][name="branchId[]"]`)
+            .append(`<option ${($.inArray(value.id, data.branches) !== -1) ? "selected" : ""} value="${value.id}">${value.branch_name} (${value.branch_type})</option>`);
+    });
 
     $("#newModalWindow").modal("show");
 }
@@ -1544,7 +1551,7 @@ var editUserAccessLevel = () => {
                 cache: false,
                 beforeSend: function() {
 
-                    $(`div[class~="launchModal"] div[class~="show-modal-title"]`).html("Edit User Access Level");
+                    $(`div[class~="launchModal"] h5[class~="show-modal-title"]`).html("Edit User Access Level");
                     $(`div[class~="launchModal"] div[class~="show-modal-body"]`).html(`<div class="col-12"><div class="card"><div class="card-body"><p class="text-center"><span class="fa fa-spinner fa-spin"></span></p></div></div></div>`);
                 },
                 success: function(data) {
@@ -1552,7 +1559,7 @@ var editUserAccessLevel = () => {
                     if (data.status == true) {
 
                         $(`div[class~="launchModal"]`).modal("show");
-
+                    $(`div[class~="launchModal"] h5[class~="modal-title"]`).html(`Access Level Control`);
                         var displayPermission = `
                         <div class="row"><div class="settings-form-msg col-12"></div>`;
 
@@ -1993,7 +2000,7 @@ async function fetchBranchLists() {
             cache: false,
             success: function(data) {
                 populateBranchesList(data.message);
-                upIDB('branches', data.message);
+                // upIDB('branches', data.message);
             },
             error: function(err) {
                 $(`div[class="form-content-loader"]`).css("display", "none");

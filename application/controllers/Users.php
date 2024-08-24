@@ -155,6 +155,10 @@ class Users extends Pos {
 			if ($query->execute([$loggedUserClientId, '1'])) {
 				$i = 0;
 
+				// get the branches list
+				$branches = $this->getBranches($loggedUserClientId);
+
+				// loop through the users list
 				while ($data = $query->fetch(PDO::FETCH_OBJ)) {
 					$i++;
 
@@ -194,11 +198,20 @@ class Users extends Pos {
 
 					$action .= "</div>";
 
+					$userBranch = explode(",", $data->branches);
+
+					$branch_name = '';
+					foreach($branches as $item) {
+						if(in_array($item->id, $userBranch)) {
+							$branch_name .= "<div>{$item->branch_name}</div>";
+						}
+					}
+
 					$message[] = [
 						'user_id' => $data->user_id,
 						'row_id' => $i,
 						'fullname' => $data->name,
-						'branch_name' => $data->branch_name,
+						'branch_name' => $branch_name,
 						'access_level' => $data->access_name,
 						'access_level_id' => $data->access_level,
 						'gender' => $data->gender,
@@ -230,6 +243,13 @@ class Users extends Pos {
 
 				$data = $query->fetch(PDO::FETCH_OBJ);
 
+				// get branches
+				$data->branches = explode(",", $data->branches);
+				foreach($data->branches as $row) {
+					$branchesList[] = (int)$row;
+				}
+
+				// set the message to return
 				$message = [
 					"user_id"	=> $data->user_id,
 					"fullname"	=> $data->name,
@@ -238,12 +258,15 @@ class Users extends Pos {
 					"gender"	=> $data->gender,
 					"contact"	=> $data->phone,
 					"email"		=> $data->email,
+					"branches"	=> $branchesList ?? [],
 					"country"	=> $data->country_id,
 					"branchId" => $data->branchId,
-					'daily_target' => $data->daily_target,
-					'monthly_target' => $data->monthly_target,
-					'weekly_target' => $data->weekly_target,
+					"branchesList" => $this->getBranches($loggedUserClientId),
+					"daily_target" => $data->daily_target,
+					"monthly_target" => $data->monthly_target,
+					"weekly_target" => $data->weekly_target,
 				];
+
 				$status = true;
 			} else {
 				$message = "Sorry! User Cannot Be Found.";
@@ -347,9 +370,9 @@ class Users extends Pos {
 									phone='{$userData->phone}', 
 									access_level='{$userData->access_level}', 
 									".(!empty($newPassword) ? "password='{$newPassword}'," : null)."
-									branchId='{$userData->branchId}', 
+									branchId='{$userData->branchId[0]}', 
 									daily_target='{$userData->daily_target}', 
-									branches='{$userData->branchId}',
+									branches='".implode(",", $userData->branchId)."',
 									weekly_target='{$userData->weekly_target}', 
 									monthly_target='{$userData->monthly_target}'",
 									"user_id='{$userData->userId}' && clientId='{$loggedUserClientId}'"
@@ -357,8 +380,14 @@ class Users extends Pos {
 
 								if ($query == true) {
 
+									// set the branches in an array if the user_id is the logged in user id
+									if($userData->userId === $loggedUserId) {
+										$this->session->set_userdata("branchId", $userData->branchId[0]);
+                        				$this->session->set_userdata("branchAccess", implode(",", $userData->branchId));
+									}
+
 									// Record user activity
-									$this->userLogs('users', $userData->userId, 'Update the user details.');
+									$this->userLogs('users', $userData->userId, "Update the user details of {$userData->fullName}.");
 
 									// check if the user has the right permissions to perform this action
 									if($this->accessObject->hasAccess('accesslevel', 'users')) {

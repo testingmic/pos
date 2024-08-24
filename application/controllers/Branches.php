@@ -16,6 +16,8 @@ class Branches extends Pos {
 		];
 
         global $config;
+        
+        $status = false;
 
         // set the logged in user id
         $loggedUserClientId = isset($this->apiAccessValues->clientId) ? xss_clean($this->apiAccessValues->clientId) : $this->session->clientId;

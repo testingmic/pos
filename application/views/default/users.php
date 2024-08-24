@@ -101,9 +101,28 @@ require_once "headtags.php";
 						<div class="form-result"></div>
 						<form autocomplete="Off" class="needs-validation submitThisForm" novalidate="" method="post" action="<?= $config->base_url('api/userManagement/addUserRecord'); ?>">
 							<div class="form-row">
-								<div class="col-md-4 mb-3">
+								<div class="col-md-8 mb-3">
 									<label for="fullName">Full Name *</label>
 									<input type="text" class="form-control" id="fullName" name="fullName" placeholder="Full Name" value="" required="">
+								</div>
+								<div class="col-md-4 mb-3">
+									<label for="gender">Gender *</label>
+									<select name="gender" id="gender" class="form-control selectpicker">
+										<option value="null">Please Select</option>
+										<option value="Male">Male</option>
+										<option value="Female">Female</option>
+									</select>
+								</div>
+							</div>
+							
+							<div class="form-row">
+								<div class="col-md-4 mb-3">
+									<label for="phone">Phone *</label>
+									<input type="text" class="form-control" name="phone" id="phone" placeholder="Phone" value="">
+								</div>
+								<div class="col-md-4 mb-3">
+									<label for="email">Email *</label>
+									<input type="email" class="form-control" name="email" id="email" placeholder="Email" value="">
 								</div>
 								<div class="col-md-4 mb-3">
 									<label for="access_level">Access Level *</label>
@@ -127,35 +146,19 @@ require_once "headtags.php";
 										?>
 									</select>
 								</div>
-								<div class="col-md-4 mb-3">
-									<label for="gender">Gender *</label>
-									<select name="gender" id="gender" class="form-control selectpicker">
-										<option value="null">Please Select</option>
-										<option value="Male">Male</option>
-										<option value="Female">Female</option>
-									</select>
-								</div>
-							</div>
-							
-							<div class="form-row">
-								<div class="col-md-4 mb-3">
-									<label for="phone">Phone *</label>
-									<input type="text" class="form-control" name="phone" id="phone" placeholder="Phone" value="">
-								</div>
-								<div class="col-md-4 mb-3">
-									<label for="email">Email *</label>
-									<input type="email" class="form-control" name="email" id="email" placeholder="Email" value="">
-								</div>
-								<div class="col-md-4 mb-3">
+								<div class="col-md-12 mb-3">
 									<label for="branchId">User Branch</label>
-									<select name="branchId" id="branchId" class="form-control selectpicker">
-										<option value="null">Please select</option>
+									<select name="branchId[]" id="branchId" multiple class="form-control selectpicker">
 										<?php
-										$branches = $pos->prepare("SELECT id, branch_name FROM `branches`");
+										$branches = $pos->prepare("SELECT id, branch_name, branch_type 
+											FROM `branches` 
+											WHERE status = '1' AND deleted = '0' AND clientId = '{$session->clientId}'");
 										$branches->execute();
 										while($branch = $branches->fetch(PDO::FETCH_OBJ)) {
 											?>
-											<option data-name="<?= $branch->branch_name; ?>" value="<?= $branch->id ?>"><?= $branch->branch_name; ?></option>
+											<option data-name="<?= $branch->branch_name; ?>" value="<?= $branch->id ?>">
+												<?= $branch->branch_name; ?> (<?= $branch->branch_type ?>)
+											</option>
 											<?php
 										}
 										?>

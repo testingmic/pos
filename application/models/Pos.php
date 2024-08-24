@@ -399,6 +399,23 @@ class Pos {
 	}
 
 	/**
+	 * Get the list of all branches
+	 * 
+	 * @return array
+	 */
+	public function getBranches($loggedUserClientId) {
+		try {
+			return $this->getAllRows(
+				"branches", 
+				"id, branch_name, branch_type", 
+				"status = '1' AND deleted = '0' AND clientId = '{$loggedUserClientId}'"
+			);
+		} catch(\Exception $e) {
+			return [];
+		}
+	}
+
+	/**
 	 * This method fetches rows and returns it as an object
 	 * @param string $table this is the table name
 	 * @param string $columns This is the columns that the user wants to fetch the value
@@ -407,13 +424,22 @@ class Pos {
 	 * @return Object 
 	 **/
 	public function getAllRows($table, $columns, $where_clause = 1) {
-		$response = false;
-		$stmt = $this->pos->prepare("SELECT {$columns} FROM {$table} WHERE {$where_clause}");
-		//print ("SELECT {$columns} FROM {$table} WHERE {$where_clause}");
-		if ($stmt->execute()) {
-			$response = $stmt->fetchAll(PDO::FETCH_OBJ);
+		
+		try {
+			
+			$response = [];
+			$stmt = $this->pos->prepare("SELECT {$columns} FROM {$table} WHERE {$where_clause}");
+			//print ("SELECT {$columns} FROM {$table} WHERE {$where_clause}");
+			if ($stmt->execute()) {
+				$response = $stmt->fetchAll(PDO::FETCH_OBJ);
+			}
+			
+			return $response;
+
+		} catch(\Exception $e) {
+			return [];
 		}
-		return $response;
+
 	}
 
 	/**

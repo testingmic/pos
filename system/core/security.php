@@ -549,6 +549,9 @@ function xss_clean($str) {
 	// This prevents sandwiching null characters
 	// between ascii characters, like Java\0script.
 	remove_invisible_characters($str);
+
+	// return if the data is an array
+	if(is_array($str)) return $str;
 	
 	// Fix &entity\n;
 	$str = str_replace(array('&amp;','&lt;','&gt;'), array('&amp;amp;','&amp;lt;','&amp;gt;'), $str);
