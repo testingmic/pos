@@ -8,9 +8,9 @@ class Authenticate {
     public $success_response;
     public $pos;
 
-    public function processLogin($username, $password, $href) {
+    public function processLogin($username, $password, $href = null) {
 
-        global $pos, $session, $config;
+        global $pos, $session;
 
         try {
 

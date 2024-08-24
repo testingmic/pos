@@ -46,7 +46,7 @@ class DB {
 			return $argon;
 			
 		} catch(PDOException $e) {
-			//die("It seems there was an error.  Please refresh your browser and try again. ".$e->getMessage());
+			die("It seems there was an error.  Please refresh your browser and try again. ".$e->getMessage());
 		}
 		
 	}

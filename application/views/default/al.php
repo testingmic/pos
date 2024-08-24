@@ -1,4 +1,10 @@
-<?php 
+<?php
+//: set the page header type
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: GET,POST,PUT");
+header("Access-Control-Max-Age: 3600");
+
 global $hrClass, $accessObject;
 
 // initializing
@@ -33,9 +39,7 @@ if(isset($_POST["username"], $_POST["password"]) && confirm_url_id(1, "dL")) {
 	if(!filter_var($username, FILTER_VALIDATE_EMAIL)) {
 		$data = "<div class='alert alert-danger'>Sorry! Invalid username/password</div>";
 	} else if(strlen($username) < 8) {
-		
 		$data = "<div class='alert alert-danger'>Sorry! Invalid username/password</div>";
-
 	} else {
 		// submit credentials to the users class to process
 		if ($auth->processLogin($username, $password, $href)->status) {

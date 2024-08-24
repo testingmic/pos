@@ -7,10 +7,10 @@ date_default_timezone_set('Europe/Lisbon');
 
 # set the constants for the database connection
 defined('ENVIRONMENT') OR define('ENVIRONMENT', 'development');
-defined('DB_HOST')  OR define('DB_HOST', "localhost");
-defined('DB_USER')  OR define('DB_USER', "mineconr_pos");
-defined('DB_PASS')  OR define('DB_PASS', "H9KW29hG=U_B");
-defined('DB_NAME')  OR define('DB_NAME', "mineconr_pos");
+defined('DB_HOST')  OR define('DB_HOST', "127.0.0.1");
+defined('DB_USER')  OR define('DB_USER', "root");
+defined('DB_PASS')  OR define('DB_PASS', "");
+defined('DB_NAME')  OR define('DB_NAME', "pos");
 
 define('TIME_PERIOD', 60);
 define('ATTEMPTS_NUMBER', 7);
