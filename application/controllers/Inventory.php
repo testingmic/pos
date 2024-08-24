@@ -660,15 +660,12 @@ class Inventory extends Pos {
      * 
      * @return array|object
      */
-    public function categoryManagement($clientData, $requestInfo, $setupInfo) {
+    public function categoryManagement($clientData, $requestInfo, $setupInfo = null) {
         
         global $config;
 
         //: initializing
-        $response = (object) [
-            "status" => "error", 
-            "message" => "Error Processing The Request"
-        ];
+        $response = (object) ["status" => "error", "message" => "Error Processing The Request"];
 
         //: if the request is from an api request then push only json raw data
 	    $rawJSON = isset($this->apiAccessValues->branchId) ? true : false;

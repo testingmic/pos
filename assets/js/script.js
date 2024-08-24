@@ -794,7 +794,7 @@ if ($(`table[class~="expensesList"]`).length) {
             data: { listExpenses: true },
             dataType: "JSON",
             success: function(resp) {
-                popCatLst(resp.result.list);
+                popCatLst(resp.message.list);
             },
             complete: function(data) {
                 hL();

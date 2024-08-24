@@ -7,7 +7,7 @@ class Branches extends Pos {
 	public $insightRequest;
 	private $loggedUserBranchId;
 
-    public function branchManagment($clientData, $requestInfo, $setupInfo) {
+    public function branchManagment($clientData, $requestInfo, $setupInfo = null) {
 
         //: initializing
 		$response = (object) [

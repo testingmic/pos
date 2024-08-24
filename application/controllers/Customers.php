@@ -96,7 +96,7 @@ class Customers extends Pos {
 		} catch(PDOException $e) { return false; }
 	}
 
-	public function customerManagement($clientData, $requestInfo, $setupInfo) {
+	public function customerManagement($clientData, $requestInfo, $setupInfo = null) {
 		
 		//: initializing
 		$response = (object) [
