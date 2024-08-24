@@ -107,7 +107,7 @@ class Expenses extends Pos {
         }
 
 		//: list categories
-		if(isset($_POST["listExpenseCategories"]) && confirm_url_id(2, "listExpenseCategories")) {
+		if(isset($_POST["listExpenseCategories"]) && $requestInfo === "listExpenseCategories") {
 			//: run the query
 			$i = 0;
 			# list categories
@@ -150,7 +150,7 @@ class Expenses extends Pos {
 			}
 		}
 
-		elseif(isset($_POST["name"], $_POST["dataset"], $_POST["description"]) && confirm_url_id(2, 'saveCategory')) {
+		elseif(isset($_POST["name"], $_POST["dataset"], $_POST["description"]) && $requestInfo === 'saveCategory') {
 			$postData = (Object) array_map("xss_clean", $_POST);
 
 			if(empty($postData->name)) {
@@ -208,7 +208,7 @@ class Expenses extends Pos {
 
 		}
 
-		elseif(isset($_POST["itemId"], $_POST["itemToDelete"]) && confirm_url_id(2, 'deleteCategory')) {
+		elseif(isset($_POST["itemId"], $_POST["itemToDelete"]) && $requestInfo === 'deleteCategory') {
 			$postData = (Object) array_map("xss_clean", $_POST);
 
 			if(empty($postData->itemId)) {
@@ -232,7 +232,7 @@ class Expenses extends Pos {
 		}
 
 		//: main expenses data
-		elseif(isset($_POST["listExpenses"]) && confirm_url_id(2, "listExpenses")) {
+		elseif(isset($_POST["listExpenses"]) && $requestInfo === "listExpenses") {
 			//: run the query
 			$i = 0;
 
@@ -294,7 +294,7 @@ class Expenses extends Pos {
 		}
 
 		//: process the expense
-		elseif(isset($_POST["expenseId"], $_POST["date"], $_POST["category"], $_POST["amount"], $_POST["tax"]) && confirm_url_id(2, 'manageExpenses')) {
+		elseif(isset($_POST["expenseId"], $_POST["date"], $_POST["category"], $_POST["amount"], $_POST["tax"]) && $requestInfo === 'manageExpenses') {
 
 			//: assign and clean the variables parsed
 			$postData = (Object) array_map('xss_clean', $_POST);
@@ -367,7 +367,8 @@ class Expenses extends Pos {
 
 		}
 
-		elseif(isset($_POST["itemId"], $_POST["itemToDelete"]) && confirm_url_id(2, 'deleteExpense')) {
+		// delete expenses record
+		elseif(isset($_POST["itemId"], $_POST["itemToDelete"]) && $requestInfo === 'deleteExpense') {
 			$postData = (Object) array_map("xss_clean", $_POST);
 
 			if(empty($postData->itemId)) {
