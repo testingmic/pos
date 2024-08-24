@@ -1105,50 +1105,36 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 		}
 
 		//: inventory management
-		elseif(confirm_url_id(1, "inventoryManagement")) {
+		elseif(in_array(confirm_url_id(1), ["inventoryManagement", "userManagement", "customerManagement"])) {
 
-			// create object for report
-			$inventoryObject = load_class('Inventory', 'controllers');
-
-			// set some additional variables
-			$inventoryObject->accessObject = $accessObject;
-			$inventoryObject->insightRequest = $insightRequest;
-			$inventoryObject->apiAccessValues = $apiAccessValues;
-			
-			// process the request
-			$response = $inventoryObject->{confirm_url_id(1)}($clientData, confirm_url_id(2));
-			
-		}
-
-		//: user management
-		elseif(confirm_url_id(1, "userManagement")) {
-
-			//: initializing
-			$message = "Error Processing Request";
-			$status = false;
-
-			// create object for report
-			$usersObject = load_class('Users', 'controllers');
-
-			// set some additional variables
-			$usersObject->accessObject = $accessObject;
-			$usersObject->apiAccessValues = $apiAccessValues;
-			
-			// process the request
-			$data = $usersObject->{confirm_url_id(1)}($clientData, confirm_url_id(2));
-
-			//: set the response to return
-			$response = [
-				"message"	=> $data['message'],
-				"status"	=> $data['status']
+			$classObject = [
+				"inventoryManagement" => "Inventory",
+				"userManagement" => "Users",
+				"customerManagement" => "Customers"
 			];
-		}
 
-		//: customers management
-		elseif (confirm_url_id(1, "customerManagement")) {
-			
-			
+			// create object for report
+			$requestObject = load_class($classObject[confirm_url_id(1)], 'controllers');
 
+			// set some additional variables
+			$requestObject->accessObject = $accessObject;
+			$requestObject->insightRequest = $insightRequest;
+			$requestObject->apiAccessValues = $apiAccessValues;
+			
+			// process the request
+			$requestData = $requestObject->{confirm_url_id(1)}($clientData, confirm_url_id(2));
+
+			if(is_array($requestData)) {
+				//: set the response to return
+				$response = [
+					"message"	=> $requestData['message'],
+					"status"	=> $requestData['status']
+				];
+			}
+			else {
+				$response = $requestData;
+			}
+			
 		}
 
 		//: delete data

@@ -18,7 +18,6 @@ class Handler extends Pos {
         //: create a new object of the notification class
 		$accountNotify = load_class('Notifications', 'controllers', $apiAccessValues->clientId);
 		$posClass->clientId = $apiAccessValues->clientId;
-		$theAccountState = $accountNotify->accountNotification()->hasExpired;
 
 		// get all the parsed data
 		$apiCallData = json_decode(file_get_contents('php://input'), true);

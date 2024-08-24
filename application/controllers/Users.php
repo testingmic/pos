@@ -8,6 +8,7 @@ class Users extends Pos {
 
 	public $accessObject;
 	public $apiAccessValues;
+	public $insightRequest;
 
 	public function __construct() {
 		parent::__construct();
@@ -124,7 +125,7 @@ class Users extends Pos {
 	public function userManagement($clientData, $requestInfo) {
 
 		// set the limit
-		$limit = (isset($_POST["limit"])) ? (int) $_POST["limit"] : 100000;
+		$limit = (isset($_POST["limit"])) ? (int) $_POST["limit"] : $this->data_limit;
 
 		$status = false;
 		$message = [];

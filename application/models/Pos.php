@@ -19,6 +19,7 @@ class Pos {
 	public $config;
 	public $ip_address;
 	public $ur;
+	public $data_limit = 100000;
 	public $availableQueryMetrics = [
 		"summaryItems", "salesOverview", "branchPerformance", 
 		"salesAttendantPerformance", "topCustomersPerformance"
