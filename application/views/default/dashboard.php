@@ -357,40 +357,40 @@ $session->insightRequest = [
               </thead>
               <tbody>
                 <?php
-                // run the query
-                $stmt = $pos->prepare("
-                  SELECT 
-                    a.id, a.branchId, a.product_title, a.product_description, a.quantity,
-                    a.product_image, a.product_price, a.cost_price, a.expiry_date, 
-                    a.threshold, b.branch_name, b.branch_color
-                  FROM products a
-                  LEFT JOIN branches b ON b.id = a.branchId
-                  WHERE 
-                    a.status = ? AND a.clientId = ? AND
-                    (
-                      DATE_ADD(a.expiry_date,
-                        INTERVAL YEAR(CURDATE()) - YEAR(a.expiry_date)
-                          + IF(DAYOFYEAR(CURDATE()) >DAYOFYEAR(a.expiry_date), 1, 0)
-                        YEAR)
-                      BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL {$clientData->expiry_notification_days})
-                    ) ORDER BY a.expiry_date
-                ");
-                $stmt->execute([1, $posClass->clientId]);
-                // initializing
-                $i = 0;
+                try {
+                  // run the query
+                  $stmt = $pos->prepare("
+                    SELECT 
+                      a.id, a.branchId, a.product_title, a.product_description, a.quantity,
+                      a.product_image, a.product_price, a.cost_price, a.expiry_date, 
+                      a.threshold, b.branch_name, b.branch_color
+                    FROM products a
+                    LEFT JOIN branches b ON b.id = a.branchId
+                    WHERE 
+                      a.status = ? AND a.clientId = ? AND
+                      a.expiry_date <= DATE(NOW() + INTERVAL {$clientData->expiry_notification_days}) ORDER BY a.expiry_date
+                  ");
+                  $stmt->execute([1, $posClass->clientId]);
+                  // initializing
+                  $i = 0;
 
-                // loop through the list of products
-                while($result = $stmt->fetch(PDO::FETCH_OBJ)) {
-                  // increment
-                  $i++;
-                  // print the list of result
-                  print "<tr>";
-                  print "<td>{$i}</td>";
-                  print "<td><a href='{$config->base_url('products/'.$result->id)}'>{$result->product_title}</a> <br> <span class='badge {$result->branch_color}'>{$result->branch_name}</span></td>";
-                  print "<td>{$result->quantity}</td>";
-                  print "<td>".date("jS M, Y", strtotime($result->expiry_date))."</td>";
-                  print "</tr>";
-                }
+                  // loop through the list of products
+                  while($result = $stmt->fetch(PDO::FETCH_OBJ)) {
+
+                    $isExpired = strtotime(date('Y-m-d')) > strtotime(date('Y-m-d', strtotime($result->expiry_date)));
+                    
+                    // increment
+                    $i++;
+                    // print the list of result
+                    print "<tr'>";
+                    print "<td>{$i}</td>";
+                    print "<td><a  href='{$config->base_url('products/'.$result->id)}'>{$result->product_title}</a> <br> 
+                      <span class='badge {$result->branch_color}'>{$result->branch_name}</span></td>";
+                    print "<td>{$result->quantity}</td>";
+                    print "<td><span>".date("jS M, Y", strtotime($result->expiry_date))."</span></td>";
+                    print "</tr>";
+                  }
+                } catch(\Exception $e) {}
                 ?>
               </tbody>
             </table>

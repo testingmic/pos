@@ -185,6 +185,12 @@ require_once "headtags.php";
 	                              	</div>
 								</div>
 							</div>
+							<div class="col-lg-15 mt-2 mb-3">
+								<small class="text-danger">
+									Leave the password fields empty if you do not wish to reset the password. 
+									However it is required for new accounts
+								</small>
+							</div>
 							<div class="form-row">
 								<div class="col-lg-4 col-md-6">
 									<label for="cost" class="text-primary-light">Password</label>
@@ -199,12 +205,6 @@ require_once "headtags.php";
 	                                  <div class="input-group-prepend"><span class="input-group-text"><i class="fa fa-lock"></i></span></div>
 	                                  <input type="password" value="" class="form-control" name="password_2">
 	                              	</div>
-								</div>
-								<div class="col-lg-15 mt-2">
-								    <small class="text-danger">
-								        Leave the password fields empty if you do not wish to reset the password. 
-								        However it is required for new accounts
-								    </small>
 								</div>
 							</div>
 							<div class="modal-footer pr-0">

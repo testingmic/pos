@@ -15,6 +15,7 @@ if(!confirm_url_id(0, 'inventory') || $session->accountExpired) {
 }
 
 global $accessObject;
+
 // create a new object for the access level
 $accessObject->userId = $session->userId;
 

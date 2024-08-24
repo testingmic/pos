@@ -180,7 +180,7 @@ $themeColors = ["danger", "indigo", "orange", "blue", "purple", "green", "teal",
               <div class="tab-pane fade" id="payment_options">
                 <div class="card" style="background: none;">
                   <?= connectionLost(); ?>
-                  <div class="row">
+                  <div class="row p-3">
                     <div class="col-lg-4">
                       <div class="card">
 
@@ -192,7 +192,7 @@ $themeColors = ["danger", "indigo", "orange", "blue", "purple", "green", "teal",
                             <div class="media-body align-self-center"> 
                               <div class="setting-detail">
                                 <h3 class="mb-0 mt-0">Cash</h3>
-                                <p class="text-muted mb-0">Accept Cash as a medium of exchange at the various Active Stores</p>
+                                <p class="text-muted mb-0">Accept physical cash as a medium of exchange at the various Active Stores.</p>
                               </div> 
                               <div class="mt-2">
                                 <div class="btn-group btn-group-toggle" data-toggle="buttons">

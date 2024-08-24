@@ -34,7 +34,7 @@ $openingDays = $clientData->shop_opening_days;
 $validDate = true;
 
 if(!in_array(date("l"), $posClass->stringToArray($openingDays))) {
-  $validDate = true;
+  $validDate = false;
 }
 
 // revert all transactions that are currently witheld
