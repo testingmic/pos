@@ -10,6 +10,7 @@ if(!$admin_user->logged_InControlled()) {
     include_once "login.php";
     exit;
 }
+
 // client data
 $clientData = $posClass->getAllRows("settings", "*", "clientId='{$posClass->clientId}'");
 $branchData = $posClass->getAllRows("branches", "*", "id='{$session->branchId}'");
@@ -156,12 +157,12 @@ if($setupInfo->type == "alpha") {
       background-color: <?= $clientData->bg_color_code; ?>;
       border: solid 1px #fff;
     }
-    .blur-content {
-      <?php if($session->accountExpired) { ?>
-        <?= "pointer-events: none;
-        filter: blur(4px);"; ?>
-      <?php } ?>
-    }
+    <?php if($session->accountExpired) { ?>
+        <?= ".blur-content {
+          pointer-events: none;
+          filter: blur(4px);
+        }"; ?>
+    <?php } ?>
   </style>
 </head>
 <body>
@@ -396,14 +397,14 @@ if($setupInfo->type == "alpha") {
                     </span>
                     <small>Sales</small>
                   </a>
-                  <a href="<?= $baseUrl ?>analytics" class="col-4 shortcut-item shortcut-offline">
+                  <a href="<?= $baseUrl ?>reports-sales" class="col-4 shortcut-item shortcut-offline">
                     <span class="shortcut-media avatar rounded-circle bg-gradient-green">
                       <i class="ni ni-books"></i>
                     </span>
                     <small>Analytics</small>
                   </a>
                   <?php if($accessObject->hasAccess('view', 'branches')) { ?>
-                  <a href="<?= $baseUrl ?>branches" class="col-4 blur-content shortcut-item shortcut-offline">
+                  <a href="<?= $baseUrl ?>outlets" class="col-4 blur-content shortcut-item shortcut-offline">
                     <span class="shortcut-media avatar rounded-circle bg-gradient-purple">
                       <i class="ni ni-pin-3"></i>
                     </span>

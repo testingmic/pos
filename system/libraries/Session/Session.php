@@ -668,8 +668,10 @@ class Session {
 	 */
 	public function sess_regenerate($destroy = FALSE)
 	{
-		$_SESSION['__ci_last_regenerate'] = time();
-		session_regenerate_id($destroy);
+		try {
+			$_SESSION['__ci_last_regenerate'] = time();
+			@session_regenerate_id($destroy);
+		} catch(\Exception $e) {}
 	}
 
 	// ------------------------------------------------------------------------

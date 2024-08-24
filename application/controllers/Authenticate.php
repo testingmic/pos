@@ -36,6 +36,7 @@ class Authenticate {
                         // set the user sessions for the person to continue
                         $session->set_userdata("puserLoggedIn", random_string('alnum', 50));
                         $session->set_userdata("branchId", $results["branchId"]);
+                        $session->set_userdata("branchAccess", !empty($results["branches"]) ? $results["branches"] : $results["branchId"]);
                         $session->set_userdata("clientId", $results["clientId"]);
                         $session->set_userdata("userId", $results["user_id"]);
                         $session->set_userdata("userName", $results["login"]);

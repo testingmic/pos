@@ -19,6 +19,10 @@ class Pos {
 	public $config;
 	public $ip_address;
 	public $ur;
+	public $availableQueryMetrics = [
+		"summaryItems", "salesOverview", "branchPerformance", 
+		"salesAttendantPerformance", "topCustomersPerformance"
+	];
 
 	public function __construct() {
 

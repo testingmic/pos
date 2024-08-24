@@ -118,6 +118,7 @@ if(isset($branch->branch_name)) {
                             <th>Purchase Price</th>
                             <th>Selling Price</th>
                             <th class="text-center">Available Stock</th>
+                            <th>Expiry Date</th>
                             <th class="text-center"></th>
                             <th class="text-center"></th>
                         </tr>

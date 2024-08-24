@@ -5501,6 +5501,7 @@ var fetchAllProducts = (branchId = null, location = branch_type) => {
                     {"data": 'cost_price'},
                     {"data": 'price'},
                     {"data": 'quantity'},
+                    {"data": 'expiry_date'},
                     {"data": 'indicator'},
                     {"data": 'action'}
                 ]
