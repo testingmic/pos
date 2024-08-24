@@ -122,7 +122,7 @@ class Users extends Pos {
 	 * 
 	 * @return array
 	 */
-	public function userManagement($clientData, $requestInfo) {
+	public function userManagement($clientData, $requestInfo, $setupInfo) {
 
 		// set the limit
 		$limit = (isset($_POST["limit"])) ? (int) $_POST["limit"] : $this->data_limit;

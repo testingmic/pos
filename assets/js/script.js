@@ -2263,7 +2263,7 @@ if ($(`table[class~="customersList"], span[class~="customersList"]`).length) {
             data: { listCustomers: true },
             dataType: "JSON",
             success: function(resp) {
-                populateCustomersList(resp.result);
+                populateCustomersList(resp.message);
             },
             complete: function(data) {
                 hL();

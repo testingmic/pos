@@ -13,7 +13,7 @@ class Inventory extends Pos {
      * 
      * @return object|array
      */
-    public function inventoryManagement($clientData, $requestInfo) {
+    public function inventoryManagement($clientData, $requestInfo, $setupInfo) {
 
         global $config;
 
