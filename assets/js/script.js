@@ -1149,9 +1149,9 @@ var ftchCutLst = async() => {
     await syncOfflineData('customers').then((resp) => {
         $.post(baseUrl + "api/fetchCustomersOptionsList", { fetchCustomersOptionsList: true }, async function(data) {
             await clearDBStore('customers').then((resp) => {
-                popCustLst(data.result);
-                if (data.result.length) {
-                    upIDB('customers', data.result);
+                popCustLst(data.message);
+                if (data.message.length) {
+                    upIDB('customers', data.message);
                 }
             });
         }, 'json');
@@ -1248,9 +1248,9 @@ var ftchPrdList = async() => {
 
     $.post(baseUrl + "api/fetchPOSProductsList", { fetchPOSProductsList: true }, async function(data) {
         await clearDBStore('request_products').then((resp) => {
-            popPrdLst(data.result);
-            if (data.result.length) {
-                upIDB('request_products', data.result);
+            popPrdLst(data.message);
+            if (data.message.length) {
+                upIDB('request_products', data.message);
             }
         });
     }, 'json');

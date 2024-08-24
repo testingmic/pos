@@ -284,5 +284,24 @@ class Customers extends Pos {
 		return json_decode(json_encode($response), true);
 
 	}
+
+	public function fetchCustomersOptionsList() {
+
+		//: fetch customers list for json
+		if(isset($_POST["fetchCustomersOptionsList"])) {
+
+			// fetch the data
+			$customersClass = load_class("Customers", "controllers");
+			$customers = $customersClass->fetch("id, customer_id, firstname, lastname, CONCAT(firstname, ' ', lastname) AS fullname, preferred_payment_type, date_log, clientId, branchId, phone_1, state, phone_2, email, residence", "AND customer_id != 'WalkIn'");
+
+			// fetch the data
+			return [
+				"status" => true,
+				"message" => $customers
+			];
+
+		}
+		
+	}
 	
 }

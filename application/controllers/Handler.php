@@ -2,6 +2,10 @@
 
 class Handler extends Pos {
     
+	public $apiAccessValues;
+    public $insightRequest;
+    public $accessObject;
+
     /**
      * Api Access Handler
      * 
@@ -96,6 +100,97 @@ class Handler extends Pos {
         return true;
 
     }
+
+	//: Return product
+	public function returnOrderProcessor($clientData, $requestInfo, $setupInfo = null) {
+
+		//: search for product
+		if($requestInfo === 'searchOrder') {
+				
+			//: order id
+			$orderId = xss_clean($_POST["orderId"]);
+
+			//: create a new object
+			$orderObj = load_class('Orders', 'controllers');
+
+			//: load the data
+			$data = $orderObj->saleDetails($orderId);
+
+			$response = [
+				'orderId' => $orderId,
+				'orderDetails' => $data,
+				'count' => count($data)
+			];
+
+		}
+
+		return $response ?? [];
+
+	}
+	
+	//: Notification handler
+	public function notificationHandler($clientData, $requestInfo, $setupInfo = null) {
+
+		//: initializing
+        $response = (object) ["status" => "error", "message" => "Error Processing The Request"];
+
+		//: enter this yard
+		if(isset($_POST["unqID"], $_POST["noteType"]) && $requestInfo === "activeNotice") {
+
+			//: unique id variable
+			$uniqueId = xss_clean($_POST["unqID"]);
+			$noteType = xss_clean($_POST["noteType"]);
+
+			//: validate the notification id
+			if($this->session->notificationId == $uniqueId) {
+				
+				//: notification loaders
+				$notify = load_class('Notifications', 'controllers');
+				$request = $notify->setUserSeen($clientData->id, $uniqueId, $noteType);
+
+				//: return a status of success
+				if($request) {
+					$response->status = "success";
+					$response->message = "Initializing Notification Seen.";
+				}
+			}
+		}
+
+		return json_decode(json_encode($response), true);
+
+	}
+
+	//: delete data
+	public function deleteData($clientData, $requestInfo, $setupInfo = null) {
+
+		//: delete data
+		if(isset($_POST['itemToDelete'], $_POST['itemId']) and $requestInfo === 'deleteData') {
+			// confirm if an id was parsed
+			$itemId = (isset($_POST['itemId'])) ? xss_clean($_POST["itemId"]) : null;
+			
+			// Record user activity
+			$this->userLogs('requests', $itemId, 'Deleted the user request from the System.');
+
+			$process = $this->db->prepare("UPDATE requests SET deleted = ? WHERE request_id = ?");
+			$process->execute([1, $itemId]);
+
+			if($process) {
+				$status = true;
+				$message = 'Record was successfully deleted.';
+			}
+
+			return [
+				"status" => $status ?? false,
+				"message" => $message ?? [],
+				"request" => 'deleteItem',
+				"itemId" => $itemId,
+				"thisRequest" => xss_clean($_POST['itemToDelete']),
+				"tableName" => xss_clean($_POST['itemToDelete']).'sList'
+			];
+			
+		}
+
+	}
 
 }
 ?>

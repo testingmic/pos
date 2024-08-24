@@ -265,5 +265,69 @@ class Salespoint extends Pos {
 
     }
 
+    public function fetchPOSProductsList() {
+
+        global $config;
+
+        //: if the request is from an api request then push only json raw data
+        $loggedUserBranchId = (isset($apiAccessValues->branchId)) ? xss_clean($apiAccessValues->branchId) : $this->session->branchId;
+        $loggedUserClientId = isset($this->apiAccessValues->clientId) ? xss_clean($this->apiAccessValues->clientId) : $this->session->clientId;
+
+        //: fetch customers list for json
+		if(isset($_POST["fetchPOSProductsList"])) {
+			// query the database
+			$result = $this->getAllRows("products", 
+				"id, product_image, category_id, product_title, source, quantity, category_id, product_image AS image,
+                    product_id, product_price, date_added, product_description, product_price, cost_price, threshold", "status = '1' 
+                    AND branchId = '{$loggedUserBranchId}' AND clientId = '{$loggedUserClientId}'");
+
+			// data
+			$productsList = [];
+			$ii = 0;
+
+			// set the payment made session as false
+			$this->session->_oid_LastPaymentMade = false;
+
+			// initializing
+			if(count($result) > 0) {
+				
+				// loop through the list of products
+				foreach($result as $results) {
+					// increment
+					$ii++;
+
+					// add to the list to return
+					$productsList[] = [
+						'row_id' => $ii,
+						'product_id' => $results->id,
+						'product_code' => $results->product_id,
+						'product_title' => $results->product_title,
+						'price' => $results->product_price,
+						'threshold' => $results->threshold,
+						'source' => $results->source,
+						'product_description' => $results->product_description,
+						'date_added' => $results->date_added,
+						'cost_price' => $results->cost_price,
+						'category_id' => $results->category_id,
+						'image' => (($results->source == 'Vend') ? $results->product_image : ((empty($results->product_image)) ? $config->base_url("assets/images/products/default.png") : ((!empty($results->product_image) && file_exists($results->product_image)) ? $config->base_url($results->product_image) : $config->base_url("assets/images/products/$results->product_image")))),
+						'product_quantity' => $results->quantity,
+						'product_price' => "<input class='form-control input_ctrl' style='width:100px' data-row-value=\"{$results->id}\" data-product-id='{$results->id}' name=\"product_price\" value=\"".$results->product_price."\" id=\"product_price_{$results->id}\" type='number' min='1'>",
+						'quantity' => "<input data-row-value=\"{$results->id}\" class='form-control input_ctrl' style='width:100px' data-product-id='{$results->id}' value='1' name=\"product_quantity\" id=\"product_quantity_{$results->id}\" type='number' min='1'>",
+						'overall' => "<span data-row-value=\"{$results->id}\" id=\"product_overall_price\">".number_format($results->product_price, 0)."</span>",
+		                "action" => "<button data-image=\"{$results->product_image}\" type=\"button\" class=\"btn btn-success atc-btn\" data-row-value=\"{$results->id}\" data-name=\"{$results->product_title}\"><i class=\"ion-ios-cart\"></i> Add</button>"
+
+					];
+				}
+			}
+
+			return [
+				"status" => true,
+				"message" => $productsList
+			];
+
+		}
+
+    }
+
 }
 ?>

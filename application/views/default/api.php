@@ -29,7 +29,7 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 	//: if the user accessed the file using an access token
 	if(isset($apiAccessValues->clientId)) {
 		
-		$handlerObject = load_class('Handler', 'models');
+		$handlerObject = load_class('Handler', 'controllers');
 		$handler = $handlerObject->apiProcess($posClass, $apiAccessValues);
 
 		if(!is_bool($handler)) {
@@ -48,10 +48,9 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 
 	// set the combined request payload
 	$combinedRequestPayload = [
-		"inventoryManagement", "userManagement", 
-		"customerManagement", "branchManagment", 
-		"categoryManagement", "expensesManagement",
-		"pointOfSaleProcessor"
+		"inventoryManagement", "userManagement", "customerManagement", "branchManagment", 
+		"categoryManagement", "expensesManagement", "pointOfSaleProcessor", "returnOrderProcessor",
+		"notificationHandler", "deleteData", "fetchCustomersOptionsList", "fetchPOSProductsList"
 	];
 
 	// set the general id
@@ -101,77 +100,9 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 
 	//: MOVE INTO THIS ENTIRE SECTION IF THE ACCOUNT HAS NOT YET EXPIRED
 	elseif(!$expiredAccount) {
-	
-		//: fetch customers list for json
-		if(isset($_POST["fetchCustomersOptionsList"]) && confirm_url_id (1, "fetchCustomersOptionsList")) {
-
-			// fetch the data
-			$customersClass = load_class("Customers", "controllers");
-			$customers = $customersClass->fetch("id, customer_id, firstname, lastname, CONCAT(firstname, ' ', lastname) AS fullname, preferred_payment_type, date_log, clientId, branchId, phone_1, state, phone_2, email, residence", "AND customer_id != 'WalkIn'");
-
-			// fetch the data
-			$customers_list = [];
-
-			$response = [
-				"status" => 200,
-				"result" => $customers
-			];
-		}
-
-		//: fetch customers list for json
-		elseif(isset($_POST["fetchPOSProductsList"]) && confirm_url_id (1, "fetchPOSProductsList")) {
-			// query the database
-			$result = $posClass->getAllRows("products", 
-				"id, product_image, category_id, product_title, source, quantity, category_id, product_image AS image, product_id, product_price, date_added, product_description, product_price, cost_price, threshold", "status = '1' AND branchId = '{$loggedUserBranchId}' AND clientId = '{$loggedUserClientId}'");
-
-			// data
-			$productsList = [];
-			$ii = 0;
-
-			// set the payment made session as false
-			$session->_oid_LastPaymentMade = false;
-
-			// initializing
-			if(count($result) > 0) {
-				
-				// loop through the list of products
-				foreach($result as $results) {
-					// increment
-					$ii++;
-
-					// add to the list to return
-					$productsList[] = [
-						'row_id' => $ii,
-						'product_id' => $results->id,
-						'product_code' => $results->product_id,
-						'product_title' => $results->product_title,
-						'price' => $results->product_price,
-						'threshold' => $results->threshold,
-						'source' => $results->source,
-						'product_description' => $results->product_description,
-						'date_added' => $results->date_added,
-						'cost_price' => $results->cost_price,
-						'category_id' => $results->category_id,
-						'image' => (($results->source == 'Vend') ? $results->product_image : ((empty($results->product_image)) ? $config->base_url("assets/images/products/default.png") : ((!empty($results->product_image) && file_exists($results->product_image)) ? $config->base_url($results->product_image) : $config->base_url("assets/images/products/$results->product_image")))),
-						'product_quantity' => $results->quantity,
-						'product_price' => "<input class='form-control input_ctrl' style='width:100px' data-row-value=\"{$results->id}\" data-product-id='{$results->id}' name=\"product_price\" value=\"".$results->product_price."\" id=\"product_price_{$results->id}\" type='number' min='1'>",
-						'quantity' => "<input data-row-value=\"{$results->id}\" class='form-control input_ctrl' style='width:100px' data-product-id='{$results->id}' value='1' name=\"product_quantity\" id=\"product_quantity_{$results->id}\" type='number' min='1'>",
-						'overall' => "<span data-row-value=\"{$results->id}\" id=\"product_overall_price\">".number_format($results->product_price, 0)."</span>",
-		                "action" => "<button data-image=\"{$results->product_image}\" type=\"button\" class=\"btn btn-success atc-btn\" data-row-value=\"{$results->id}\" data-name=\"{$results->product_title}\"><i class=\"ion-ios-cart\"></i> Add</button>"
-
-					];
-				}
-			}
-
-			$response = [
-				"status" => 200,
-				"result" => $productsList
-			];
-
-		}
 
 		//: Quotes / Requests
-		elseif(isset($_POST["listRequests"], $_POST["requestType"]) && confirm_url_id(1, 'listRequests')) {
+		if(isset($_POST["listRequests"], $_POST["requestType"]) && confirm_url_id(1, 'listRequests')) {
 			// assign variable to remove
 			$postData = (Object) array_map('xss_clean', $_POST);
 
@@ -307,12 +238,17 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 
 			$classObject = [
 				"pointOfSaleProcessor" =>  "Salespoint",
+				"fetchPOSProductsList" => "Salespoint",
 				"inventoryManagement" => "Inventory",
 				"categoryManagement" => "Inventory",
 				"customerManagement" => "Customers",
+				"fetchCustomersOptionsList" => "Customers",
 				"expensesManagement" => "Expenses",
 				"branchManagment" => "Branches",
-				"userManagement" => "Users"
+				"userManagement" => "Users",
+				"returnOrderProcessor" => "Handler",
+				"notificationHandler" => "Handler",
+				"deleteData" => "Handler"
 			];
 
 			// create object for report
@@ -336,33 +272,6 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 			else {
 				$response = $requestData;
 			}
-			
-		}
-
-		//: delete data
-		elseif(isset($_POST['itemToDelete'], $_POST['itemId']) and confirm_url_id(1, 'deleteData')) {
-			// confirm if an id was parsed
-			$itemId = (isset($_POST['itemId'])) ? xss_clean($_POST["itemId"]) : null;
-			
-			// Record user activity
-			$posClass->userLogs('requests', $itemId, 'Deleted the user request from the System.');
-
-			$process = $pos->prepare("UPDATE requests SET deleted = ? WHERE request_id = ?");
-			$process->execute([1, $itemId]);
-
-			if($process) {
-				$status = true;
-				$message = 'Record was successfully deleted.';
-			}
-
-			$response = array(
-				"status" => $status,
-				"message" => $message,
-				"request" => 'deleteItem',
-				"itemId" => $itemId,
-				"thisRequest" => xss_clean($_POST['itemToDelete']),
-				"tableName" => xss_clean($_POST['itemToDelete']).'sList'
-			);
 			
 		}
 
@@ -610,58 +519,6 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 		            }
 		        }
 
-			}
-
-		}
-
-		//: Return product
-		elseif(confirm_url_id(1, "returnOrderProcessor")) {
-			
-			//: search for product
-			if(confirm_url_id(2, 'searchOrder')) {
-				
-				//: order id
-				$orderId = xss_clean($_POST["orderId"]);
-
-				//: create a new object
-				$orderObj = load_class('Orders', 'controllers');
-
-				//: load the data
-				$data = $orderObj->saleDetails($orderId);
-
-				$response = [
-					'orderId' => $orderId,
-					'orderDetails' => $data,
-					'count' => count($data)
-				];
-
-			}
-
-		}
-
-		//: Notification handler
-		elseif(confirm_url_id(1, "notificationHandler")) {
-
-			//: enter this yard
-			if(isset($_POST["unqID"], $_POST["noteType"]) && confirm_url_id(2, "activeNotice")) {
-
-				//: unique id variable
-				$uniqueId = xss_clean($_POST["unqID"]);
-				$noteType = xss_clean($_POST["noteType"]);
-
-				//: validate the notification id
-				if($session->notificationId == $uniqueId) {
-			        
-			        //: notification loaders
-					$notify = load_class('Notifications', 'controllers');
-					$request = $notify->setUserSeen($clientData->id, $uniqueId, $noteType);
-
-			        //: return a status of success
-			        if($request) {
-				        $response->status = "success";
-				        $response->message = "Initializing Notification Seen.";
-				   	}
-				}
 			}
 
 		}
