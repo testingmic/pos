@@ -19,8 +19,7 @@ class Branches extends Pos {
 
         // set the logged in user id
         $loggedUserClientId = isset($this->apiAccessValues->clientId) ? xss_clean($this->apiAccessValues->clientId) : $this->session->clientId;
-        $loggedUserId = (isset($apiAccessValues->userId)) ? xss_clean($apiAccessValues->userId) : $this->session->userId;
-
+        
         //: if the request is from an api request then push only json raw data
 	    $rawJSON = isset($this->apiAccessValues->branchId) ? true : false;
         
@@ -585,7 +584,7 @@ class Branches extends Pos {
         $response->message = $message;
         $response->status = $status;
 
-        return $response;
+        return json_decode(json_encode($response), true);
     }
 
 }

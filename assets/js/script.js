@@ -626,29 +626,29 @@ if ($(`table[class~="productsList"]`).length) {
         $(`div[class="form-content-loader"]`).css("display", "none");
 
         $.post(baseUrl + "api/categoryManagement/saveCategory", { name: name, id: id, dataset: request }, (res) => {
-                if (res.status == 200) {
-                    $(`div[class~="categoryModal"]`).modal('hide');
-                    Toast.fire({
-                        type: 'success',
-                        title: res.message
-                    });
-                    $(`div[class="form-content-loader"]`).css("display", "none");
-                    listCatLst();
-                } else {
-                    Toast.fire({
-                        type: 'error',
-                        title: res.message
-                    });
-                    $(`div[class="form-content-loader"]`).css("display", "none");
-                }
-            }, 'json')
-            .catch((err) => {
+            if (res.status == 200) {
+                $(`div[class~="categoryModal"]`).modal('hide');
+                Toast.fire({
+                    type: 'success',
+                    title: res.message
+                });
+                $(`div[class="form-content-loader"]`).css("display", "none");
+                listCatLst();
+            } else {
                 Toast.fire({
                     type: 'error',
-                    title: "Error Processing Request"
-                })
+                    title: res.message
+                });
                 $(`div[class="form-content-loader"]`).css("display", "none");
-            });
+            }
+        }, 'json')
+        .catch((err) => {
+            Toast.fire({
+                type: 'error',
+                title: "Error Processing Request"
+            })
+            $(`div[class="form-content-loader"]`).css("display", "none");
+        });
     });
 
     var popCatLst = (productsCategoryData) => {
@@ -688,7 +688,7 @@ if ($(`table[class~="productsList"]`).length) {
             data: { listProductCategories: true },
             dataType: "JSON",
             success: function(resp) {
-                popCatLst(resp.result);
+                popCatLst(resp.message);
             },
             complete: function(data) {
                 hL();

@@ -46,6 +46,13 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 	$insightRequest = (isset($_POST["insightRequest"])) ? $_POST["insightRequest"] : $session->insightRequest;
 	$limit = (isset($_POST["limit"])) ? (int) $_POST["limit"] : 100000;
 
+	// set the combined request payload
+	$combinedRequestPayload = [
+		"inventoryManagement", "userManagement", 
+		"customerManagement", "branchManagment", 
+		"categoryManagement"
+	];
+
 	// set the general id
 	$session->userId = $loggedUserId;
 	$session->clientId = $loggedUserClientId;
@@ -542,13 +549,14 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 		}
 
 		//: inventory management
-		elseif(in_array(confirm_url_id(1), ["inventoryManagement", "userManagement", "customerManagement", "branchManagment"])) {
+		elseif(in_array(confirm_url_id(1), $combinedRequestPayload)) {
 
 			$classObject = [
 				"inventoryManagement" => "Inventory",
-				"userManagement" => "Users",
+				"categoryManagement" => "Inventory",
 				"customerManagement" => "Customers",
-				"branchManagment" => "Branches"
+				"branchManagment" => "Branches",
+				"userManagement" => "Users"
 			];
 
 			// create object for report
@@ -600,116 +608,6 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 				"tableName" => xss_clean($_POST['itemToDelete']).'sList'
 			);
 			
-		}
-
-		//: Products category management
-		elseif(confirm_url_id(1, "categoryManagement")) {
-
-			//: list categories
-			if(isset($_POST["listProductCategories"]) && confirm_url_id(2, "listProductCategories")) {
-				//: run the query
-				$i = 0;
-	            # list categories
-	            $categoryList = $posClass->getAllRows("products_categories a", "a.*, (SELECT COUNT(*) FROM products b WHERE a.category_id = b.category_id) AS products_count", "a.clientId='{$loggedUserClientId}' LIMIT {$limit}");
-
-	            $categories = [];
-	            // loop through the branches list
-	            foreach($categoryList as $eachCategory) {
-	            	$i++;
-	            	
-	            	if($rawJSON) {
-	            		unset($eachCategory->id);
-	            		$categories[] = $eachCategory;
-	            	} else {
-		            	$eachCategory->row = $i;
-		            	$eachCategory->action = "";
-
-		            	if($accessObject->hasAccess('category_update', 'products')) {
-
-		            		$eachCategory->action .= "<a data-content='".json_encode($eachCategory)."' href=\"javascript:void(0);\" class=\"btn btn-sm btn-outline-primary edit-category\" data-id=\"{$eachCategory->id}\"><i class=\"fa fa-edit\"></i></a>";
-		            	}
-		            	
-		            	if($accessObject->hasAccess('category_delete', 'products')) {
-		            		$eachCategory->action .= "<a href=\"javascript:void(0);\" class=\"btn btn-sm btn-outline-danger delete-item\" data-msg=\"Are you sure you want to delete this Product Category?\" data-request=\"category\" data-url=\"{$config->base_url('api/categoryManagement/deleteCategory')}\" data-id=\"{$eachCategory->id}\"><i class=\"fa fa-trash\"></i></a>";
-		            	}
-
-		            	if(empty($eachCategory->action)) {
-		            		$eachCategory->action = "---";
-		            	}
-		            	$categories[] = $eachCategory;
-		            }	                
-	           	}
-
-	           	$response = [
-	           		'status' => 200,
-	           		'result' => $categories
-	           	];
-			}
-
-			elseif(isset($_POST["name"], $_POST["dataset"]) && confirm_url_id(2, 'saveCategory')) {
-				$postData = (Object) array_map("xss_clean", $_POST);
-
-				if(empty($postData->name)) {
-					$response->message = "Category name cannot be empty";
-				} else {
-					if($postData->dataset == "update") {
-						$query = $pos->prepare("UPDATE products_categories SET category = '{$postData->name}' WHERE id='{$postData->id}' AND clientId='{$loggedUserClientId}'");
-
-						if($query->execute()) {
-							$response->status = 200;
-							$response->message = "Product category was updated";
-							$response->href = $config->base_url('settings/prd');
-						}
-					}
-					elseif($postData->dataset == "add") {
-						
-						$itemId = "PC".$posClass->orderIdFormat($clientData->id.$posClass->lastRowId('products_categories'));
-
-						// execute the statement
-						$query = $pos->prepare("
-							INSERT INTO products_categories 
-							SET category = '{$postData->name}', 
-							category_id='{$itemId}', clientId='{$loggedUserClientId}'
-						");
-
-						// if it was successfully executed
-						if($query->execute()) {
-							$response->status = 200;
-							$response->message = "Product category was inserted";
-							$response->href = $config->base_url('settings/prd');
-
-							// Record user activity
-							$posClass->userLogs('product-type', $itemId, 'Added a new product category into the system.');
-						}
-					}
-				}
-
-			}
-
-			elseif(isset($_POST["itemId"], $_POST["itemToDelete"]) && confirm_url_id(2, 'deleteCategory')) {
-				$postData = (Object) array_map("xss_clean", $_POST);
-
-				if(empty($postData->itemId)) {
-					$response->message = "Error processing request";
-				} else {
-
-					// delete the product type from the system
-					$query = $pos->prepare("DELETE FROM products_categories WHERE id='{$postData->itemId}' AND clientId='{$loggedUserClientId}'");
-					
-					// if it was successfully executed
-					if($query->execute()) {
-						// set the response data
-						$response->reload = true;
-						$response->status = true;
-						$response->href = $config->base_url('settings/prd');
-						$response->message = "Product category successfully deleted";
-						
-						// Record user activity
-						$posClass->userLogs('product-type', $postData->itemId, 'Deleted the Product Type from the system.');
-					}
-				}
-			}
-
 		}
 
 		//: Import manager

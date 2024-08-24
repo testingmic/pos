@@ -367,7 +367,10 @@ class Inventory extends Pos {
                 $response->message = "Products stock was successfully updated.";
             }
 
-        } else {
+        }
+
+        // all other requests
+        else {
             
             // set default data
             $response->branchId = $loggedUserBranchId;
@@ -649,6 +652,137 @@ class Inventory extends Pos {
         }
 
         return $response;
+
+    }
+
+    /**
+     * Manage all categories in the system
+     * 
+     * @return array|object
+     */
+    public function categoryManagement($clientData, $requestInfo, $setupInfo) {
+        
+        global $config;
+
+        //: initializing
+        $response = (object) [
+            "status" => "error", 
+            "message" => "Error Processing The Request"
+        ];
+
+        //: if the request is from an api request then push only json raw data
+	    $rawJSON = isset($this->apiAccessValues->branchId) ? true : false;
+
+        // set the limit
+		$limit = (isset($_POST["limit"])) ? (int) $_POST["limit"] : $this->data_limit;
+
+        // set the logged in user id
+        $loggedUserClientId = isset($this->apiAccessValues->clientId) ? xss_clean($this->apiAccessValues->clientId) : $this->session->clientId;
+
+        //: list categories
+        if(isset($_POST["listProductCategories"]) && $requestInfo === "listProductCategories") {
+            //: run the query
+            $i = 0;
+            # list categories
+            $categoryList = $this->getAllRows("products_categories a", "a.*, (SELECT COUNT(*) FROM products b WHERE a.category_id = b.category_id) AS products_count", "a.clientId='{$loggedUserClientId}' LIMIT {$limit}");
+
+            $categories = [];
+            // loop through the branches list
+            foreach($categoryList as $eachCategory) {
+                $i++;
+                
+                if($rawJSON) {
+                    unset($eachCategory->id);
+                    $categories[] = $eachCategory;
+                } else {
+                    $eachCategory->row = $i;
+                    $eachCategory->action = "";
+
+                    if($this->accessObject->hasAccess('category_update', 'products')) {
+
+                        $eachCategory->action .= "<a data-content='".json_encode($eachCategory)."' href=\"javascript:void(0);\" class=\"btn btn-sm btn-outline-primary edit-category\" data-id=\"{$eachCategory->id}\"><i class=\"fa fa-edit\"></i></a>";
+                    }
+                    
+                    if($this->accessObject->hasAccess('category_delete', 'products')) {
+                        $eachCategory->action .= "<a href=\"javascript:void(0);\" class=\"btn btn-sm btn-outline-danger delete-item\" data-msg=\"Are you sure you want to delete this Product Category?\" data-request=\"category\" data-url=\"{$config->base_url('api/categoryManagement/deleteCategory')}\" data-id=\"{$eachCategory->id}\"><i class=\"fa fa-trash\"></i></a>";
+                    }
+
+                    if(empty($eachCategory->action)) {
+                        $eachCategory->action = "---";
+                    }
+                    $categories[] = $eachCategory;
+                }	                
+            }
+
+            $response->message = $categories;
+            $response->status = true;
+        }
+
+        elseif(isset($_POST["name"], $_POST["dataset"]) && $requestInfo === 'saveCategory') {
+            $postData = (Object) array_map("xss_clean", $_POST);
+
+            if(empty($postData->name)) {
+                $response->message = "Category name cannot be empty";
+            } else {
+                if($postData->dataset == "update") {
+                    $query = $this->db->prepare("UPDATE products_categories SET category = '{$postData->name}' WHERE id='{$postData->id}' AND clientId='{$loggedUserClientId}'");
+
+                    if($query->execute()) {
+                        $response->status = 200;
+                        $response->message = "Product category was updated";
+                        $response->href = $config->base_url('settings/prd');
+                    }
+                }
+                elseif($postData->dataset == "add") {
+                    
+                    $itemId = "PC".$this->orderIdFormat($clientData->id.$this->lastRowId('products_categories'));
+
+                    // execute the statement
+                    $query = $this->db->prepare("
+                        INSERT INTO products_categories 
+                        SET category = '{$postData->name}', 
+                        category_id='{$itemId}', clientId='{$loggedUserClientId}'
+                    ");
+
+                    // if it was successfully executed
+                    if($query->execute()) {
+                        $response->status = 200;
+                        $response->message = "Product category was inserted";
+                        $response->href = $config->base_url('settings/prd');
+
+                        // Record user activity
+                        $this->userLogs('product-type', $itemId, 'Added a new product category into the system.');
+                    }
+                }
+            }
+
+        }
+
+        elseif(isset($_POST["itemId"], $_POST["itemToDelete"]) && $requestInfo === 'deleteCategory') {
+            $postData = (Object) array_map("xss_clean", $_POST);
+
+            if(empty($postData->itemId)) {
+                $response->message = "Error processing request";
+            } else {
+
+                // delete the product type from the system
+                $query = $this->db->prepare("DELETE FROM products_categories WHERE id='{$postData->itemId}' AND clientId='{$loggedUserClientId}'");
+                
+                // if it was successfully executed
+                if($query->execute()) {
+                    // set the response data
+                    $response->reload = true;
+                    $response->status = true;
+                    $response->href = $config->base_url('settings/prd');
+                    $response->message = "Product category successfully deleted";
+                    
+                    // Record user activity
+                    $this->userLogs('product-type', $postData->itemId, 'Deleted the Product Type from the system.');
+                }
+            }
+        }
+
+        return json_decode(json_encode($response), true);
 
     }
 
