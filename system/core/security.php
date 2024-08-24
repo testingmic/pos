@@ -550,8 +550,6 @@ function xss_clean($str) {
 	// between ascii characters, like Java\0script.
 	remove_invisible_characters($str);
 	
-	$str = filter_var($str, FILTER_SANITIZE_STRING);
-	
 	// Fix &entity\n;
 	$str = str_replace(array('&amp;','&lt;','&gt;'), array('&amp;amp;','&amp;lt;','&amp;gt;'), $str);
 	$str = preg_replace('/(&#*\w+)[\x00-\x20]+;/u', '$1;', $str);

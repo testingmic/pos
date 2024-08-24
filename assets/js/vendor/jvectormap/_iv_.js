@@ -410,7 +410,7 @@ $(`div[class~="update-stock-rows"] button[class~="append-row"]`).on('click', fun
     }
 
     $(`div[class~="update-stock-rows"] div[data-row]:last`).after(`
-        <div class="row stock-listing" data-row="${lastRowId}">
+        <div class="row p-3 stock-listing" data-row="${lastRowId}">
             <div class="col-md-4 mb-3">
                 <div>
                     <select data-row="${lastRowId}" name="product_id_${lastRowId}" id="product_id_${lastRowId}" class="form-control selectpicker">

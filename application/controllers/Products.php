@@ -10,8 +10,6 @@ class Products extends Pos {
 
 
 	# Main PDO Connection Instance
-	protected $session;
-
 	public function __construct($clientId = null){
 		global $session, $config, $pos;
 		
@@ -27,11 +25,11 @@ class Products extends Pos {
      *
      * @param String $branchID Pass branch id to fetch details
      *
-     * @return String $this->_message
+     * @return String $_message
      */
     public function getAllBranches($branchID = false)
     {
-        $this->_message = false;
+        $_message = false;
 
         $condition = ($branchID == false) ? false : "AND id = '{$branchID}'";
 
@@ -40,10 +38,10 @@ class Products extends Pos {
         );
 
         if ($stmt->execute()) {
-            $this->_message = $stmt->fetchAll(PDO::FETCH_OBJ);
+            $_message = $stmt->fetchAll(PDO::FETCH_OBJ);
         }
 
-        return $this->_message;
+        return $_message;
     }
 
     /**
@@ -51,21 +49,21 @@ class Products extends Pos {
      *
      * @param String $branchID Pass branch id to fetch details
      *
-     * @return String $this->_message
+     * @return String $_message
      */
     public function getCountdata($tableName, $whereClause)
     {
-        $this->_message = 0;
+        $_message = 0;
 
         $stmt = $this->db->prepare(
             "SELECT COUNT(*) AS total FROM {$tableName} WHERE {$whereClause}"
         );
 
         if ($stmt->execute()) {
-            $this->_message = $stmt->fetch(PDO::FETCH_OBJ)->total;
+            $_message = $stmt->fetch(PDO::FETCH_OBJ)->total;
         }
 
-        return $this->_message;
+        return $_message;
     }
 
 	public function all($returnCount = false, $branchId = null) {
@@ -139,16 +137,19 @@ class Products extends Pos {
 				CONCAT('', '', IFNULL(product_image, '$this->defaultImg'))) AS image 
 			FROM products WHERE status='1' AND $column = '{$productId}' {$condition} LIMIT 1
 		");
-		$stmt->execute([$productId]);
+		$stmt->execute();
 		$result = $stmt->fetch(PDO::FETCH_OBJ);
 		
 		if(!empty($product)) {
 			$product = $result;
 		}
+		
 		else return $result;
 	}
 
 	public function addProduct(stdClass $product){
+
+		$product->expiry_date = $this->setExpiryDate($product->expiry_date);
 
 		$params = [
 			$product->productId,
@@ -252,7 +253,15 @@ class Products extends Pos {
 		")->execute([$productId, $branchId]);
 	}
 
+	public function setExpiryDate($expiry_date = '') {
+
+		return !empty($product->expiry_date) && $expiry_date !== '0000-00-00' ? $expiry_date : date('Y-m-d', strtotime('+5 year'));;
+
+	}
+
 	public function addStockToBranch(stdClass $product){
+
+		$product->expiry_date = $this->setExpiryDate($product->expiry_date);
 
 		$params = [
 			$product->expiry_date,

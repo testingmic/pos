@@ -109,7 +109,6 @@ class CI_Session_files_driver extends CI_Session_driver implements SessionHandle
 		}
 		else
 		{
-			log_message('debug', 'Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.');
 			$this->_config['save_path'] = rtrim(ini_get('session.save_path'), '/\\');
 		}
 
@@ -127,9 +126,10 @@ class CI_Session_files_driver extends CI_Session_driver implements SessionHandle
 	 *
 	 * @param	string	$save_path	Path to session files' directory
 	 * @param	string	$name		Session cookie name
+	 * 
 	 * @return	bool
 	 */
-	public function open($save_path, $name)
+	public function open($save_path, $name) : bool
 	{
 		if ( ! is_dir($save_path))
 		{
@@ -163,7 +163,7 @@ class CI_Session_files_driver extends CI_Session_driver implements SessionHandle
 	 * @param	string	$session_id	Session ID
 	 * @return	string	Serialized session data
 	 */
-	public function read($session_id)
+	public function read($session_id):string|false
 	{
 		// This might seem weird, but PHP 5.6 introduces session_reset(),
 		// which re-reads session data
@@ -173,13 +173,11 @@ class CI_Session_files_driver extends CI_Session_driver implements SessionHandle
 
 			if (($this->_file_handle = fopen($this->_file_path.$session_id, 'c+b')) === FALSE)
 			{
-				log_message('error', "Session: Unable to open file '".$this->_file_path.$session_id."'.");
 				return $this->_failure;
 			}
 
 			if (flock($this->_file_handle, LOCK_EX) === FALSE)
 			{
-				log_message('error', "Session: Unable to obtain lock for file '".$this->_file_path.$session_id."'.");
 				fclose($this->_file_handle);
 				$this->_file_handle = NULL;
 				return $this->_failure;
@@ -192,7 +190,7 @@ class CI_Session_files_driver extends CI_Session_driver implements SessionHandle
 			{
 				chmod($this->_file_path.$session_id, 0600);
 				$this->_fingerprint = md5('');
-				return '';
+				return false;
 			}
 		}
 		// We shouldn't need this, but apparently we do ...
@@ -218,6 +216,7 @@ class CI_Session_files_driver extends CI_Session_driver implements SessionHandle
 		}
 
 		$this->_fingerprint = md5($session_data);
+
 		return $session_data;
 	}
 
@@ -232,7 +231,7 @@ class CI_Session_files_driver extends CI_Session_driver implements SessionHandle
 	 * @param	string	$session_data	Serialized session data
 	 * @return	bool
 	 */
-	public function write($session_id, $session_data)
+	public function write($session_id, $session_data) : bool
 	{
 		// If the two IDs don't match, we have a session_regenerate_id() call
 		// and we need to close the old handle and open a new one
@@ -271,7 +270,6 @@ class CI_Session_files_driver extends CI_Session_driver implements SessionHandle
 			if ( ! is_int($result))
 			{
 				$this->_fingerprint = md5(substr($session_data, 0, $written));
-				log_message('error', 'Session: Unable to write data.');
 				return $this->_failure;
 			}
 		}
@@ -289,7 +287,7 @@ class CI_Session_files_driver extends CI_Session_driver implements SessionHandle
 	 *
 	 * @return	bool
 	 */
-	public function close()
+	public function close(): bool
 	{
 		if (is_resource($this->_file_handle))
 		{
@@ -312,7 +310,7 @@ class CI_Session_files_driver extends CI_Session_driver implements SessionHandle
 	 * @param	string	$session_id	Session ID
 	 * @return	bool
 	 */
-	public function destroy($session_id)
+	public function destroy($session_id):bool
 	{
 		if ($this->close() === $this->_success)
 		{
@@ -353,11 +351,10 @@ class CI_Session_files_driver extends CI_Session_driver implements SessionHandle
 	 * @param	int 	$maxlifetime	Maximum lifetime of sessions
 	 * @return	bool
 	 */
-	public function gc($maxlifetime)
+	public function gc($maxlifetime) : int|false
 	{
 		if ( ! is_dir($this->_config['save_path']) OR ($directory = opendir($this->_config['save_path'])) === FALSE)
 		{
-			log_message('debug', "Session: Garbage collector couldn't list files under directory '".$this->_config['save_path']."'.");
 			return $this->_failure;
 		}
 

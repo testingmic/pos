@@ -374,6 +374,7 @@ function isNumber(evt) {
 }
 
 async function dOC() {
+    return 1;
     return $.ajax({
         url: `${baseUrl}users/onlineCheck`,
         type: "POST",
@@ -2019,7 +2020,7 @@ var trgPrtRpt = (saleId = null) => {
     );
 }
 
-function qPrt() {
+function quickPrt() {
     let orderId = $(`span[class="generated_order"]`).html();
     let rcpContent = $(`div[class="pwizard-fieldset"]`).html();
     var printWn = window.open(
@@ -2565,7 +2566,7 @@ if($(".make-online-payment").length) {
                         //         });
                         //         $(".cash-process-loader").removeClass("d-flex");
                         //         if(storeValues.prt == "yes") {
-                        //             qPrt();
+                        //             quickPrt();
                         //         }
                         //         ftchPrdList();
                         //         Cookies.set('offlineSales', 'available');
@@ -2583,7 +2584,7 @@ if($(".make-online-payment").length) {
                                     title: "Payment Successfully Recorded"
                                 });
                                 if(storeValues.prt == "yes") {
-                                    qPrt();
+                                    quickPrt();
                                 }
                                 upIDB('sales', res.data._oData).then(() => {
                                     Cookies.set('offlineSales', 'unavailable');
@@ -5747,7 +5748,7 @@ $(`div[class~="update-stock-rows"] button[class~="append-row"]`).on('click', fun
     }
 
     $(`div[class~="update-stock-rows"] div[data-row]:last`).after(`
-        <div class="row stock-listing" data-row="${lastRowId}">
+        <div class="row p-3 stock-listing" data-row="${lastRowId}">
         <div class="col-md-4 mb-3">
         <div>
         <select data-row="${lastRowId}" name="product_id_${lastRowId}" id="product_id_${lastRowId}" class="form-control selectpicker">

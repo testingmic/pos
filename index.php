@@ -5,7 +5,10 @@ $application_folder = "application";
 
 #display errors
 error_reporting(E_ALL);
-// ini_set("display_errors", 0);
+
+// display the erros
+ini_set("display_errors", 1);
+
 #set new places for my error recordings
 ini_set("log_errors","1");
 ini_set("error_log", "errors_log");

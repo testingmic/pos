@@ -158,8 +158,8 @@ if($setupInfo->type == "alpha") {
     }
     .blur-content {
       <?php if($session->accountExpired) { ?>
-        pointer-events: none;
-        filter: blur(4px);
+        <?= "pointer-events: none;
+        filter: blur(4px);"; ?>
       <?php } ?>
     }
   </style>

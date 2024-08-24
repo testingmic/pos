@@ -1223,6 +1223,11 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 					// loop through the product information that have been fetched
 					while($product_result = $products_stmt->fetch(PDO::FETCH_OBJ)) {
 						$iv++;
+
+						$product_result->totalProductsSoldCost = !$product_result->totalProductsSoldCost ? 0 : $product_result->totalProductsSoldCost;
+						$product_result->totalProductsRevenue = !$product_result->totalProductsRevenue ? 0 : $product_result->totalProductsRevenue;
+						$product_result->totalProductsProfit = !$product_result->totalProductsProfit ? 0 : $product_result->totalProductsProfit;
+						
 						$productsArray[] = [
 							'row_id' => $iv,
 							'percentage' => ($product_result->totalProductsRevenue > 0) ? number_format(($product_result->totalProductsRevenue/$overallSale)*100) : 0,

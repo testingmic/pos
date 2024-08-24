@@ -236,7 +236,7 @@ class Pos {
 	 * @desc Receives user query and returns the full data array
 	 * @return array
 	 **/
-	public function pushQuery($columns = "*", $tableName, $whereClause = null) {
+	public function pushQuery($columns = "*", $tableName = null, $whereClause = null) {
 		try {
 
 			$stmt = $this->pos->prepare("SELECT {$columns} FROM {$tableName} WHERE $whereClause");
@@ -269,7 +269,7 @@ class Pos {
 	 * @return null
 	 *
 	 **/
-	public function userLogs($page, $itemId = null, $description, $clientId = null, $branchId = null, $userId = null) {
+	public function userLogs($page, $itemId = null, $description = null, $clientId = null, $branchId = null, $userId = null) {
 		
 		try {
 
@@ -359,7 +359,7 @@ class Pos {
 	 * @param $message - This will contain the actual content of the email
 	 * @return bool
 	 **/
-	public function sendEmail($unique_id, $template = 'default', $fullname = null, $subject, $sent_to, $message, $copy_to = null) : bool {
+	public function sendEmail($unique_id, $template = 'default', $fullname = null, $subject = null, $sent_to = null, $message = null, $copy_to = null) : bool {
 
 		$stmt = $this->pos->prepare("
 			INSERT INTO emails SET unique_id = ?, template=?, subject = ?, fullname = ?, sent_to = ?, message = ?, copy_to = ?, clientId = ?

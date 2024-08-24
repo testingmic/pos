@@ -244,7 +244,7 @@
 <script src="<?= $baseUrl ?>assets/js/argon.min9f1e.js"></script>
 <script src="<?= $baseUrl ?>assets/vendor/sweetalert2/dist/sweetalert2.min.js"></script>
 <script type="text/javascript">var baseUrl = '<?= $baseUrl; ?>';</script>
-<script src="<?= $baseUrl ?>assets/js/_js.v1.js"></script>
+<script src="<?= $baseUrl ?>assets/js/script.js"></script>
 <script>
 <?php if($clientData->display_clock) { ?>
 function update_clock() {

@@ -54,8 +54,8 @@ abstract class CI_Session_driver implements SessionHandlerInterface {
 
 		if (is_php('7'))
 		{
-			$this->_success = TRUE;
-			$this->_failure = FALSE;
+			$this->_success = true;
+			$this->_failure = false;
 		}
 		else
 		{

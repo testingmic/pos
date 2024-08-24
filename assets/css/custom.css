@@ -130,6 +130,12 @@ a.current .card {
   }
 }
 
+@media (min-width: 992px) {
+  .modal-lg, .modal-xl {
+      max-width: 1200px;
+  }
+}
+
 
 .box,
 .box-placeholder {
