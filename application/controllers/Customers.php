@@ -17,10 +17,16 @@ class Customers extends Pos {
 	}
 
 	public function fetch($columns = "*", $whereClause = null, $leftJoin = null, $limit = 100000){
-		$sql = "SELECT $columns FROM customers a {$leftJoin} WHERE a.clientId = ? AND a.status = ? {$whereClause} ORDER BY a.id DESC LIMIT {$limit}";
-		$stmt = $this->db->prepare($sql);
-		$stmt->execute([$this->clientId, 1]);
-		return $stmt->fetchAll(PDO::FETCH_OBJ);	
+		
+		try {
+			$sql = "SELECT $columns FROM customers a {$leftJoin} WHERE a.clientId = ? AND a.status = ? {$whereClause} ORDER BY a.id DESC LIMIT {$limit}";
+			$stmt = $this->db->prepare($sql);
+			$stmt->execute([$this->clientId, 1]);
+			return $stmt->fetchAll(PDO::FETCH_OBJ);	
+		} catch(\Exception $e) {
+			return [];
+		}
+
 	}
 
 	public function quickAdd(stdClass $postData) {
@@ -32,7 +38,8 @@ class Customers extends Pos {
 				// insert user organization details first
 				$customer_id = (empty($postData->customer_id)) ? "POS".random_string('nozero', 12) : $postData->customer_id;
 								
-				$stmt = $this->db->prepare("INSERT INTO customers SET customer_id=?, firstname=?, lastname=?, phone_1=?, title=?, owner_id=?, email=?, branchId = ?, clientId = ?, phone_2 = ?, residence = ?, postal_address =?");
+				$stmt = $this->db->prepare("INSERT INTO customers SET customer_id=?, firstname=?, lastname=?, phone_1=?, title=?, 
+					owner_id=?, email=?, branchId = ?, clientId = ?, phone_2 = ?, residence = ?, postal_address =?");
 				
 				if($stmt->execute([
 					$customer_id, 
@@ -287,12 +294,21 @@ class Customers extends Pos {
 
 	public function fetchCustomersOptionsList() {
 
+		// handle the logged in branch id
+        $this->loggedUserBranchId = (isset($this->apiAccessValues->branchId)) ? xss_clean($this->apiAccessValues->branchId) : $this->session->branchId;
+
+		// set the logged in user id
+        $loggedUserClientId = isset($this->apiAccessValues->clientId) ? xss_clean($this->apiAccessValues->clientId) : $this->session->clientId;
+
 		//: fetch customers list for json
 		if(isset($_POST["fetchCustomersOptionsList"])) {
 
 			// fetch the data
 			$customersClass = load_class("Customers", "controllers");
-			$customers = $customersClass->fetch("id, customer_id, firstname, lastname, CONCAT(firstname, ' ', lastname) AS fullname, preferred_payment_type, date_log, clientId, branchId, phone_1, state, phone_2, email, residence", "AND customer_id != 'WalkIn'");
+			$customers = $customersClass->fetch("id, customer_id, firstname, lastname, CONCAT(firstname, ' ', lastname) AS fullname, 
+				preferred_payment_type, date_log, clientId, branchId, phone_1, state, phone_2, email, residence", 
+				"AND customer_id != 'WalkIn' AND branchId = '{$this->loggedUserBranchId}' AND clientId = '{$loggedUserClientId}'"
+			);
 
 			// fetch the data
 			return [

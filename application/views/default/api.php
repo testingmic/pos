@@ -276,6 +276,14 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 			else {
 				$response = $requestData;
 			}
+
+			if(isset($requestData['data'])) {
+				$response['data'] = $requestData['data'];
+			}
+
+			if(isset($requestData->data)) {
+				$response->data = $requestData->data;
+			}
 			
 		}
 

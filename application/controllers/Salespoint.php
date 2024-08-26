@@ -35,6 +35,12 @@ class Salespoint extends Pos {
                 $response->message = "Please enter a valid email address";
             }
             else{
+                // set the owner id
+                $customer->userId = $this->userData->user_id;
+                $customer->branchId = $this->session->branchId;
+                $customer->clientId = $this->userData->clientId;
+
+                // create the new customer
                 $newCustomer = $customersObj->quickAdd($customer);
                 if(!empty($newCustomer)){
                     $response->status = "success";
