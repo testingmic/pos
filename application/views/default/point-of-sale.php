@@ -38,6 +38,9 @@ if(!in_array(date("l"), $posClass->stringToArray($openingDays))) {
   $validDate = false;
 }
 
+// format the branches the user has access to
+$branchAccess = explode(",", $userData->branches);
+
 // revert all transactions that are currently witheld
 $posClass->revertTransaction();
 ?>
@@ -73,6 +76,22 @@ a[href="#finish"] {
 <div class="container-fluid mt--6">
   
   <div class="row">
+      <?php if(count($branchAccess) > 1 && empty($session->selectedSingleBranch)) { ?>
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body text-center">
+              <div>
+                You have access to more than one Point of Sale, Kindly select a branch to proceed with the sale.
+              </div>
+              <div class="text-center">
+                <select style="max-width: 400px" class="form-control selectpicker" name="branch_selector" id="branch_selector">
+
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      <?php } else { ?>
       <div class="col-lg-6">
         <div class="card">
           <?= (!$validDate) ? nonWorkingDay() : null; ?>
@@ -342,6 +361,7 @@ a[href="#finish"] {
           </div>
         </div>
       </div>
+      <?php } ?>
       <div class="row"></div>
   </div>
 <?php if($validDate  && !$session->accountExpired) { ?>

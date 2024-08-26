@@ -14,9 +14,10 @@ ini_set("log_errors","1");
 ini_set("error_log", "errors_log");
 
 # Path to the system directory
-DEFINE('BASEPATH', $system_folder.DIRECTORY_SEPARATOR);
-DEFINE('APPPATH', $application_folder.DIRECTORY_SEPARATOR);
-DEFINE('VIEWPATH', $application_folder.DIRECTORY_SEPARATOR);
+define('ROOTPATH', __DIR__);
+define('BASEPATH', $system_folder.DIRECTORY_SEPARATOR);
+define('APPPATH', $application_folder.DIRECTORY_SEPARATOR);
+define('VIEWPATH', $application_folder.DIRECTORY_SEPARATOR);
 
 function forceHttps() {
 	if($_SERVER["SERVER_PORT"] !==433 && (empty($_SERVER["HTTPS"]) || $_SERVER["HTTPS"]=="off")) {
@@ -48,8 +49,8 @@ REQUIRE "system/core/pos.php";
 	creating absolute URI's if needed, etc, etc
 */
 $chop = -STRLEN(BASENAME($_SERVER['SCRIPT_NAME']));
-DEFINE('DOC_ROOT', SUBSTR($_SERVER['SCRIPT_FILENAME'], 0, $chop));
-DEFINE('URL_ROOT', SUBSTR($_SERVER['SCRIPT_NAME'], 0, $chop));
+define('DOC_ROOT', SUBSTR($_SERVER['SCRIPT_FILENAME'], 0, $chop));
+define('URL_ROOT', SUBSTR($_SERVER['SCRIPT_NAME'], 0, $chop));
 
 # strip off the URL root from REQUEST_URI
 IF (URL_ROOT != '/') $URL = SUBSTR($URL, STRLEN(URL_ROOT));
