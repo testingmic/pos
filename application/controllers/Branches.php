@@ -595,12 +595,24 @@ class Branches extends Pos {
             else {
                 
                 // set the branch id in session
-                $this->session->selectedSingleBranch = (int) $_POST["branchId"];
+                $this->session->set_userdata("selectedSingleBranch", (int) $_POST["branchId"]);
+                $this->session->set_userdata("branchId", (int)$_POST["branchId"]);
 
                 // set the success variables
                 $status = true;
                 $message = "Branch was successfully set.";
             }
+        }
+
+        // set the default branch for the point of sale
+        elseif($requestInfo === 'changeDefaultBranch') {
+
+            // set the branch id in session
+            $this->session->selectedSingleBranch = null;
+
+            // set the success variables
+            $status = true;
+            $message = "Default branch successful removed.";
         }
 
         $response->message = $message ?? "Unable to process request.";

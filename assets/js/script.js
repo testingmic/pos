@@ -612,6 +612,18 @@ var discountCalculator = () => {
     });
 }
 
+var changeDefaultBranch = () => {
+    $.post(baseUrl + "api/branchManagment/changeDefaultBranch", (res) => {
+        Toast.fire({
+            type: responseCode(res.status),
+            title: res.message
+        });
+        if (res.status == 200 || res.status === true) {
+            setTimeout(() => { window.location.reload(); }, 2000);
+        }
+    }, 'json')
+}
+
 var setSelectedPointOfSale = () => {
     let branchId = $(`select[name="branch_selector"][id="branch_selector"]`).val();
     if(!branchId.length) {

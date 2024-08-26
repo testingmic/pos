@@ -434,15 +434,26 @@ class Pos {
 	 * @return array
 	 */
 	public function getBranches($loggedUserClientId) {
+
 		try {
-			return $this->getAllRows(
+
+			// get the list of all branches
+			$branches = $this->getAllRows(
 				"branches", 
 				"id, branch_name, branch_type, location", 
 				"status = '1' AND deleted = '0' AND clientId = '{$loggedUserClientId}'"
 			);
+
+			// loop through and set the id of the branch as the key
+			foreach($branches as $row) {
+				$branchList[$row->id] = $row;
+			}
+
+			return $branchList ?? [];
 		} catch(\Exception $e) {
 			return [];
 		}
+
 	}
 
 	/**
