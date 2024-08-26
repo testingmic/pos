@@ -70,6 +70,7 @@ $accessChecker = $accessObject->hasAccess('inventory_branches', 'products');
 								WHERE $whereClause ORDER BY a.id DESC LIMIT 200
 							");
 							$stmt->execute();
+							
 							// using the while loop to get the records
 							while($result = $stmt->fetch(PDO::FETCH_OBJ)) {
 								// increment

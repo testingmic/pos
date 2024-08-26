@@ -239,6 +239,7 @@ require_once "headtags.php";
                             ?>
                             <div data-branch-id="<?= $data->id ?>" data-toggle="tooltip" class="col-lg-6 col-md-6 complete-branch-selection" title="Choose to import data to the <?= $data->branch_name ?>">
                                 <div class="card">
+                                    
                                     <div <?= ($session->curBranchId == $data->id) ? "style='border: solid 1px {$clientData->bg_color_code}'" : null; ?> class="card text-center branch-select">
                                         <h3><?= $data->branch_name ?></h3>
                                         <?= $branch_type ?>

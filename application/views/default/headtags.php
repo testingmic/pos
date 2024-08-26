@@ -467,6 +467,10 @@ if($setupInfo->type == "alpha") {
                   <i class="ni ni-calendar-grid-58"></i>
                   <span>Login History</span>
                 </a>
+                <a href="<?= $baseUrl ?>users-activity-logs" class="dropdown-item blur-content shortcut-offline">
+                  <i class="ni ni-badge"></i>
+                  <span>Activity Logs</span>
+                </a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item logout" data-value="logout" href="<?= $config->base_url('login?logout'); ?>">
                   <i class="ni ni-user-run"></i>
