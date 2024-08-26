@@ -583,7 +583,27 @@ class Branches extends Pos {
 
         }
 
-        $response->message = $message;
+        // set the default branch for the point of sale
+        elseif(isset($_POST['branchId']) && $requestInfo === 'setDefaultBranch') {
+
+            // if the branch id is not in the list of user branches and user has no permission to manage branch
+            if(!in_array($_POST['branchId'], $this->userData->branches) && !$this->accessObject->hasAccess('monitoring', 'branches')) {
+                $message = "Sorry! You do not have the permission to access this branch.";
+            }
+            
+            // set the branch id in session
+            else {
+                
+                // set the branch id in session
+                $this->session->selectedSingleBranch = (int) $_POST["branchId"];
+
+                // set the success variables
+                $status = true;
+                $message = "Branch was successfully set.";
+            }
+        }
+
+        $response->message = $message ?? "Unable to process request.";
         $response->status = $status;
 
         return json_decode(json_encode($response), true);

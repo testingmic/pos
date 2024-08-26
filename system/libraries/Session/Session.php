@@ -666,7 +666,7 @@ class Session {
 	 * @param	bool	$destroy	Destroy old session data flag
 	 * @return	void
 	 */
-	public function sess_regenerate($destroy = FALSE)
+	public function sess_regenerate(bool $destroy = false)
 	{
 		try {
 			$_SESSION['__ci_last_regenerate'] = time();

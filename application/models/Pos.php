@@ -19,6 +19,7 @@ class Pos {
 	public $config;
 	public $ip_address;
 	public $ur;
+	public $userData;
 	public $data_limit = 100000;
 	public $availableQueryMetrics = [
 		"summaryItems", "salesOverview", "branchPerformance", 
@@ -47,6 +48,28 @@ class Pos {
 		$this->browser = $this->ur->browser();
 
 		$this->clientId = $session->clientId;
+
+		// set the user data if the user is logged in
+		$this->setUserData();
+	}
+
+	/**
+	 * Set the logged in user's data
+	 * 
+	 * @return bool
+	 */
+	private function setUserData() {
+
+		if(empty($this->session)) return;
+
+		$this->userData = $this->getAllRows("users", "*", "user_id='{$this->session->userId}'")[0] ?? [];
+
+		if(!empty($this->userData)) {
+			$this->userData->branches = !empty($this->userData->branches) ? explode(",", $this->userData->branches) : [$this->userData->branchId];
+		}
+
+		return true;
+
 	}
 
 	/**
@@ -80,6 +103,13 @@ class Pos {
 
 	}
 
+	/**
+	 * Get and set the client's / store data
+	 * 
+	 * @param string|null		$clientId
+	 * 
+	 * @return array
+	 */
 	public function clientData($clientId = null) {
 		$clientId = (!empty($clientId)) ? $clientId : $this->clientId;
 		$clientData = $this->pushQuery("*", "settings", "(id='{$clientId}' OR clientId='{$clientId}')")[0];
@@ -407,7 +437,7 @@ class Pos {
 		try {
 			return $this->getAllRows(
 				"branches", 
-				"id, branch_name, branch_type", 
+				"id, branch_name, branch_type, location", 
 				"status = '1' AND deleted = '0' AND clientId = '{$loggedUserClientId}'"
 			);
 		} catch(\Exception $e) {

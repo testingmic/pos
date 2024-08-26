@@ -14,10 +14,13 @@ if(!$admin_user->logged_InControlled()) {
 // client data
 $clientData = $posClass->getAllRows("settings", "*", "clientId='{$posClass->clientId}'");
 $branchData = $posClass->getAllRows("branches", "*", "id='{$session->branchId}'");
-$userData = $posClass->getAllRows("users", "*", "user_id='{$session->userId}'");
+
+// get the client's data 
 $clientData = $clientData[0];
 $branchData = $branchData[0];
-$userData = $userData[0];
+
+// set the user data
+$userData = $posClass->userData;
 
 // notification loaders
 $notify = load_class('Notifications', 'controllers', $clientData->id);

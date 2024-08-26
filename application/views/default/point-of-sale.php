@@ -39,7 +39,8 @@ if(!in_array(date("l"), $posClass->stringToArray($openingDays))) {
 }
 
 // format the branches the user has access to
-$branchAccess = explode(",", $userData->branches);
+$branchAccess = $userData->branches;
+$branchesList = $posClass->getBranches($clientData->clientId);
 
 // revert all transactions that are currently witheld
 $posClass->revertTransaction();
@@ -80,13 +81,21 @@ a[href="#finish"] {
         <div class="col-lg-12">
           <div class="card">
             <div class="card-body text-center">
-              <div>
+              <div class="alert alert-warning">
                 You have access to more than one Point of Sale, Kindly select a branch to proceed with the sale.
               </div>
               <div class="text-center">
                 <select style="max-width: 400px" class="form-control selectpicker" name="branch_selector" id="branch_selector">
-
+                  <option value="">Select The Branch To Load</option>
+                  <?php foreach($branchesList as $branch) {
+                    if(strtolower($branch->branch_type) !== 'store') continue;
+                    ?>
+                    <option value="<?= $branch->id ?>"><?= $branch->branch_name ?> (<?= $branch->location ?>)</option>
+                  <?php } ?>
                 </select>
+                <div class="mt-3">
+                  <button onclick="return setSelectedPointOfSale()" class="btn <?= $clientData->btn_outline; ?>">Proceed to Point of Sale</button>
+                </div>
               </div>
             </div>
           </div>

@@ -67,6 +67,9 @@ function cOS() {
 }
 cOS();
 
+var responseCode = (code) => {
+    return code == 200 || code === true ? "success" : "error";
+}
 
 async function dPv(sN) {
     await listIDB(sN).then((result) => {
@@ -609,6 +612,28 @@ var discountCalculator = () => {
     });
 }
 
+var setSelectedPointOfSale = () => {
+    let branchId = $(`select[name="branch_selector"][id="branch_selector"]`).val();
+    if(!branchId.length) {
+        Toast.fire({
+            type: 'error',
+            title: "You must first select a branch in order to proceed."
+        });
+        return true;
+    }
+    $.post(baseUrl + "api/branchManagment/setDefaultBranch", { branchId }, (res) => {
+        Toast.fire({
+            type: responseCode(res.status),
+            title: res.message
+        });
+        if (res.status == 200 || res.status === true) {
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        }
+    }, 'json')
+}
+
 if ($(`table[class~="productsList"]`).length) {
 
     $(`div[class="main-content"]`).on('click', `a[class~="add-category"]`, function(e) {
@@ -627,19 +652,15 @@ if ($(`table[class~="productsList"]`).length) {
         $(`div[class="form-content-loader"]`).css("display", "none");
 
         $.post(baseUrl + "api/categoryManagement/saveCategory", { name: name, id: id, dataset: request }, (res) => {
+            Toast.fire({
+                type: responseCode(res.status),
+                title: res.message
+            });
             if (res.status == 200) {
                 $(`div[class~="categoryModal"]`).modal('hide');
-                Toast.fire({
-                    type: 'success',
-                    title: res.message
-                });
                 $(`div[class="form-content-loader"]`).css("display", "none");
                 listCatLst();
             } else {
-                Toast.fire({
-                    type: 'error',
-                    title: res.message
-                });
                 $(`div[class="form-content-loader"]`).css("display", "none");
             }
         }, 'json')
@@ -1534,7 +1555,6 @@ var editUserDetails = () => {
     });
 }
 
-
 var editUserAccessLevel = () => {
 
     $(`div[class="main-content"]`).on("click", `button[class~="edit-access-level"]`, function(e) {
@@ -2287,73 +2307,74 @@ if ($(`table[class~="customersList"], span[class~="customersList"]`).length) {
 }
 
 $("#newCustomer_form").on("submit", async function(event) {
-            event.preventDefault();
-            let formData = $(this).serialize();
-            $(".content-loader", $("#newCustomerModal")).css({ display: "flex" });
+    event.preventDefault();
+    let formData = $(this).serialize();
+    $(".content-loader", $("#newCustomerModal")).css({ display: "flex" });
 
-            await dOC().then((itResp) => {
-                if (itResp == 1) {
-                    noInternet = false;
-                    $(`div[class="connection"]`).css('display', 'none');
-                    $(`div[class~="offline-placeholder"]`).css('display', 'none');
-                } else {
-                    noInternet = true;
-                    $(`div[class="connection"]`).css('display', 'block');
-                    $(`div[class~="offline-placeholder"]`).css('display', 'flex');
-                }
-            }).catch((err) => {
-                noInternet = true;
-                $(`div[class="connection"]`).css('display', 'block');
-                $(`div[class~="offline-placeholder"]`).css('display', 'flex');
+    await dOC().then((itResp) => {
+        if (itResp == 1) {
+            noInternet = false;
+            $(`div[class="connection"]`).css('display', 'none');
+            $(`div[class~="offline-placeholder"]`).css('display', 'none');
+        } else {
+            noInternet = true;
+            $(`div[class="connection"]`).css('display', 'block');
+            $(`div[class~="offline-placeholder"]`).css('display', 'flex');
+        }
+    }).catch((err) => {
+        noInternet = true;
+        $(`div[class="connection"]`).css('display', 'block');
+        $(`div[class~="offline-placeholder"]`).css('display', 'flex');
+    });
+
+    if (noInternet) {
+
+        let customerId = rndInt(12);
+
+        var formDetails = [{
+            customer_id: `AR${customerId}`,
+            title: $(`select[name="nc_title"]`).val(),
+            firstname: $(`input[name="nc_firstname"]`).val(),
+            lastname: $(`input[name="nc_lastname"]`).val(),
+            phone_1: $(`input[name="nc_contact"]`).val(),
+            email: $(`input[name="nc_email"]`).val(),
+            clientId: storeValues.clientId,
+            state: 'MODIFIED',
+            branchId: storeValues.branchId,
+            fullname: $(`input[name="nc_firstname"]`).val() + ' ' + $(`input[name="nc_lastname"]`).val()
+        }];
+
+        if ($(`input[name="nc_firstname"]`).val().length < 2) {
+            Toast.fire({
+                type: 'error',
+                title: `Please enter customer's firstname`
             });
+            $(".content-loader", $("#newCustomerModal")).css({ display: "none" });
 
-            if (noInternet) {
+            return false;
+        } else if ($(`input[name="nc_lastname"]`).val().length < 2) {
+            Toast.fire({
+                type: 'error',
+                title: `Please enter customer's lastname`
+            });
+            $(".content-loader", $("#newCustomerModal")).css({ display: "none" });
 
-                let customerId = rndInt(12);
+            return false;
+        } else {
+            var details = await aIDB('customers', formDetails).then((resp) => {
+                $("#newCustomer_form").parents(".modal").modal("hide");
+                $(".content-loader", $("#newCustomerModal")).css({ display: "none" });
 
-                var formDetails = [{
-                    customer_id: `AR${customerId}`,
-                    title: $(`select[name="nc_title"]`).val(),
-                    firstname: $(`input[name="nc_firstname"]`).val(),
-                    lastname: $(`input[name="nc_lastname"]`).val(),
-                    phone_1: $(`input[name="nc_contact"]`).val(),
-                    email: $(`input[name="nc_email"]`).val(),
-                    clientId: storeValues.clientId,
-                    state: 'MODIFIED',
-                    branchId: storeValues.branchId,
-                    fullname: $(`input[name="nc_firstname"]`).val() + ' ' + $(`input[name="nc_lastname"]`).val()
-                }];
-
-                if ($(`input[name="nc_firstname"]`).val().length < 2) {
-                    Toast.fire({
-                        type: 'error',
-                        title: `Please enter customer's firstname`
-                    });
-                    $(".content-loader", $("#newCustomerModal")).css({ display: "none" });
-
-                    return false;
-                } else if ($(`input[name="nc_lastname"]`).val().length < 2) {
-                    Toast.fire({
-                        type: 'error',
-                        title: `Please enter customer's lastname`
-                    });
-                    $(".content-loader", $("#newCustomerModal")).css({ display: "none" });
-
-                    return false;
-                } else {
-                    var details = await aIDB('customers', formDetails).then((resp) => {
-
-                                $("#newCustomer_form").parents(".modal").modal("hide");
-                                $(".content-loader", $("#newCustomerModal")).css({ display: "none" });
-
-                                $(".customer-select").children("option:first").after(`<option selected data-email='${$(`input[name="nc_email"]`).val()}' data-contact='${$(`input[name="nc_contact"]`).val()}' value=${customerId}>${$(`input[name="nc_firstname"]`).val()} ${$(`input[name="nc_lastname"]`).val()}</option>`)
+                $(".customer-select").children("option:first").after(`
+                        <option selected data-email='${$(`input[name="nc_email"]`).val()}' 
+                        data-contact='${$(`input[name="nc_contact"]`).val()}' value=${customerId}>${$(`input[name="nc_firstname"]`).val()} 
+                        ${$(`input[name="nc_lastname"]`).val()}</option>`)
                 if($(`input[name="nc_email"]`).length){
                     $("#receipt-email").val($(`input[name="nc_email"]`).val());
                 }
 
                 $("#newCustomer_form").trigger("reset");
                 $(".customer-select").trigger("change");
-
             });
 
             return false;
@@ -5646,8 +5667,6 @@ $(".transfer-selected-products").on("click", function(e) {
     $(".transferBulkProductModal").modal("show");
 });
 
-
-
 var removeRow = () => {
     $(`span[class~="remove-row"]`).on('click', function() {
         let rowId = $(this).attr('data-value');
@@ -5872,6 +5891,7 @@ $("form[class~='submit-bulk-transfer-product']").on("submit", function(e) {
     }
 
 });
+
 if($(`div[id="payment_options"]`).length) {
     function loadPaymentOptions() {       
         $.ajax({

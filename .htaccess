@@ -1,5 +1,5 @@
 RewriteEngine on
-RewriteBase /
+RewriteBase /argon
 RewriteCond $1 !^(index\.php|assets|robots\.txt)
 RewriteRule ^test($|/) - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
