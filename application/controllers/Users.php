@@ -624,7 +624,7 @@ class Users extends Pos {
 	 * @return bool
 	 */
 	public function logged_InControlled() {
-		return ($this->session->puserLoggedIn && $this->session->userId) ? true : false;
+		return ($this->session->puserLoggedIn && $this->session->userId);
 	}
 
 	public function logout_user() {

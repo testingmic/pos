@@ -598,6 +598,9 @@ class Branches extends Pos {
                 $this->session->set_userdata("selectedSingleBranch", (int) $_POST["branchId"]);
                 $this->session->set_userdata("branchId", (int)$_POST["branchId"]);
 
+                // update the user record
+                $this->db->query("UPDATE users SET branchId = {$_POST["branchId"]} WHERE user_id = '{$this->session->userId}' LIMIT 1");
+
                 // set the success variables
                 $status = true;
                 $message = "Branch was successfully set.";
