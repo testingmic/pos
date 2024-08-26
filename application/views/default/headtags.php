@@ -19,6 +19,9 @@ $branchData = $posClass->getAllRows("branches", "*", "id='{$session->branchId}'"
 $clientData = $clientData[0];
 $branchData = $branchData[0];
 
+// get the list of all branches
+$branchesList = $posClass->getBranches($clientData->clientId);
+
 // set the user data
 $userData = $posClass->userData;
 

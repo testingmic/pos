@@ -12,7 +12,7 @@ if($session->accountExpired) {
 // include the header file
 require_once "headtags.php";
 
-global $branchData, $clientData, $userData;
+global $branchData, $clientData, $userData, $branchesList;
 
 // create some few objects
 $productsClass = load_class("Products", "controllers");
@@ -37,7 +37,6 @@ $validDate = in_array(date("l"), $posClass->stringToArray($clientData->shop_open
 
 // format the branches the user has access to
 $branchAccess = $userData->branches;
-$branchesList = $posClass->getBranches($clientData->clientId);
 
 // handle the select branch
 $selectBranchRequired = count($branchAccess) > 1 && empty($session->selectedSingleBranch);
@@ -101,6 +100,15 @@ a[href="#finish"] {
           </div>
         </div>
       <?php } else { ?>
+        <?php if(count($branchAccess) > 1) { ?>
+          <div class="col-lg-12 text-center">
+            <div class="alert alert-success">
+              Note that this sale will be recorded under the branch: 
+              <strong class="text-uppercase">"<?= $branchesList[$session->selectedSingleBranch]->branch_name; ?>"</strong> set as the default sales branch.
+              <span onclick="return changeDefaultBranch()" class="cursor text-underline" title="Click to change branch">Do you wish to change it?</span>
+            </div>
+          </div>
+        <?php } ?>
         <div class="col-lg-6">
           <div class="card">
             <?= (!$validDate) ? nonWorkingDay() : null; ?>
@@ -370,14 +378,6 @@ a[href="#finish"] {
             </div>
           </div>
         </div>
-        <?php if(count($branchAccess) > 1) { ?>
-          <div class="col-lg-12 text-center">
-            <div class="alert alert-warning">
-              You have selected <strong>"<?= $branchesList[$session->selectedSingleBranch]->branch_name; ?>"</strong> as the current branch do you wish to change it?
-              <span onclick="return changeDefaultBranch()" class="cursor text-underline" title="Click to change branch">Change Branch.</span>
-            </div>
-          </div>
-        <?php } ?>
       <?php } ?>
       <div class="row"></div>
   </div>
