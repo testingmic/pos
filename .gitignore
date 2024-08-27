@@ -1,3 +1,6 @@
 application/sessions
 !application/sessions/index.html
 .DS_Store
+.htaccess
+system/config/config.php
+system/config/constants.php
