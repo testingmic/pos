@@ -379,12 +379,6 @@ function isNumber(evt) {
 
 async function dOC() {
     return 1;
-    return $.ajax({
-        url: `${baseUrl}users/onlineCheck`,
-        type: "POST",
-        data: { onlineCheck: true },
-        timeout: 5000
-    });
 }
 
 if ($(`table[class~="simple-table"]`).length) {
@@ -3604,7 +3598,9 @@ $(function() {
                     $(`p[data-model="sales-without-discount"] span`).html(resp.result.sales.discount_effect.discounted_sale);
                 }
 
+                if(typeof resp.result.sales.products_performance !== 'undefined') {
                 populateProductsPerformance(resp.result.sales.products_performance);
+                }
 
                 if ($("#sales-overview-chart").length) {
 
@@ -5973,3 +5969,11 @@ if($(`div[id="payment_options"]`).length) {
     }
     loadPaymentOptions();
 }
+
+$(window).on("load", function() {
+    setInterval(() => { 
+        $.ajax({
+            url: `${baseUrl}api/userManagement/onlineCheck`, type: "POST", data: { onlineCheck: true }, timeout: 5000
+        });
+    }, 10000);
+});

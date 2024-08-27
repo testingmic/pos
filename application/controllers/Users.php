@@ -609,6 +609,12 @@ class Users extends Pos {
 			
 		}
 
+		//: check if the user is online
+		elseif(isset($_POST['onlineCheck']) && $requestInfo === 'onlineCheck') {
+			$status = true;
+			$message = "User is online.";
+		}
+
 		return [
 			'status' => $status,
 			'message' => $message

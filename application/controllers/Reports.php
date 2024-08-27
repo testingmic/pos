@@ -94,8 +94,6 @@ class Reports extends Pos {
             $branchAccess = " AND a.branchId = '{$this->loggedUserBranchId}'";
         }
 
-		$this->branchAccessInner = " AND b.branchId = '{$this->loggedUserBranchId}'";
-
 		$resultData = [];
 		$metric = "unknown";
 
@@ -744,7 +742,6 @@ class Reports extends Pos {
 							products a
 						LEFT JOIN branches b ON b.id = a.branchId
 						WHERE a.status = '1' {$branchLimit} {$branchAccess} {$clientAccess} ORDER BY totalProductsProfit DESC LIMIT {$productLimit}
-
 					");
 					$products_stmt->execute();
 					
