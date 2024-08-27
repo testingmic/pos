@@ -76,7 +76,7 @@ class Reports extends Pos {
      * 
      * @return array|object
      */
-    public function reportsAnalytics($clientData, $setupInfo, $expiredAccount) {
+    public function reportsAnalytics($clientData, $setupInfo, $expiredAccount, $requestInfo = '') {
 
         $this->setVariables($clientData, $_POST);
 
@@ -105,7 +105,7 @@ class Reports extends Pos {
 		];
 
 		// process the summary results set
-		if (isset($_POST['generateReport'], $_POST['queryMetric']) && confirm_url_id(2, 'generateReport')) {
+		if (isset($_POST['generateReport'], $_POST['queryMetric']) && $requestInfo === 'generateReport') {
 
 			// default variables
 			$productLimit = 100;
@@ -127,7 +127,7 @@ class Reports extends Pos {
 			}
 
 			// set the range in a session
-			if(isset($postData->salesBranch)) {
+			if(!empty($postData->salesBranch)) {
 				$this->session->set_userdata("reportBranch", $branch);
 				$branchAccess = " AND a.branchId = '{$postData->salesBranch}'";
 			}

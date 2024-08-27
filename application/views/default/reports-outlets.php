@@ -132,11 +132,11 @@ $session->insightRequest = [];
                                 <th>Total Sales</th>
                                 <th>Highest Sale</th>
                                 <th>Lowest Sale</th>
-                                <th>Average Sale</th>
+                                <th>Avg. Sale</th>
                                 <th>Sales Count</th>
                                 <th>Sales Per Square Foot</th>
                                 <th>Customers Count</th>
-                                <th>Average Sales Per Customer</th>
+                                <th>Avg. Sales Per Customer</th>
                                 <th>Products Count</th>
                             </thead>
                             <tbody></tbody>
