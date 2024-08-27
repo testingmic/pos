@@ -5,7 +5,7 @@ $PAGETITLE = "Analytics";
 // include the important files
 require_once "headtags.php";
 
-global $setupInfo, $clientData, $filterPeriod;
+global $setupInfo, $clientData, $filterPeriod, $branchesList;
 
 $session->reportingCustomerId = null;
 $session->productsLimit = 50;
@@ -39,7 +39,19 @@ $session->insightRequest = [
 <div class="container-fluid mt--6">
   
   <div class="row mb-2 pos-reporting">
-      <div class="col-lg-9 col-mb-8"></div>
+      <div class="col-lg-6 col-mb-8"></div>
+      <div class="col-md-3 mb-2">
+        <select style="max-width: 400px" class="form-control selectpicker" name="selected_branch" id="selected_branch">
+          <option value="">Select Branch</option>
+          <?php foreach($branchesList as $branch) {
+            if(strtolower($branch->branch_type) !== 'store') continue;
+            ?>
+            <option <?= $session->reportBranch == $branch->id ? "selected" : null; ?> value="<?= $branch->id ?>">
+              <?= $branch->branch_name ?> (<?= $branch->location ?>)
+            </option>
+          <?php } ?>
+        </select>
+      </div>
       <div class="col-lg-3 col-mb-4 mb-2">
           <select class="form-control selectpicker" name="periodSelected">
             <?php foreach($filterPeriod as $key => $value) { ?>
@@ -56,6 +68,10 @@ $session->insightRequest = [
           
 
         <style>
+            .select2-container .select2-selection--single {
+                line-height: 2.5;
+                height: 54px;
+            }
             .reports-summary .card p, .reports-details .card p {
                 font-size: 12px;
                 /*color: #fff;*/

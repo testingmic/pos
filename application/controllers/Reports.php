@@ -463,12 +463,12 @@ class Reports extends Pos {
 					];
 					$resultData[] = [
 						"column" => "gross-margin-return-investment",
-						"total" => $clientData->default_currency . number_format($grossMarginInvestmentReturn, 2), 
+						"total" => $clientData->default_currency . (!empty($grossMarginInvestmentReturn) ? number_format($grossMarginInvestmentReturn, 2) : 0), 
 						"trend" => "Gross margin investment returns"
 					];
 					$resultData[] = [
 						"column" => "stock-turnover-rate",
-						"total" => $clientData->default_currency . number_format($stockTurnoverRate, 2), 
+						"total" => $clientData->default_currency . (!empty($stockTurnoverRate) ? number_format($stockTurnoverRate, 2) : 0), 
 						"trend" => "Total Stock Turnover Rate"
 					];
 					$resultData[] = [
@@ -478,12 +478,12 @@ class Reports extends Pos {
 					];
 					$resultData[] = [
 						"column" => "sales-per-employee",
-						"total" => $clientData->default_currency . number_format($salesPerEmployee, 2),
+						"total" => $clientData->default_currency . (!empty($salesPerEmployee) ?number_format($salesPerEmployee, 2) : 0),
 						"trend" => $salesPerEmployeeTrend . " ".$display
 					];
 					$resultData[] = [
 						"column" => "gross-profit",
-						"total" => $clientData->default_currency . number_format($grossProfit, 2),
+						"total" => $clientData->default_currency . (!empty($grossProfit) ? number_format($grossProfit, 2) : 0),
 						"trend" => $grossProfitTrend . " " .$display
 					];
 					$resultData[] = [
@@ -503,7 +503,7 @@ class Reports extends Pos {
 					];
 					$resultData[] = [
 						"column" => "net-profit",
-						"total" => $clientData->default_currency . number_format($netProfit, 2),
+						"total" => $clientData->default_currency . (!empty($netProfit) ? number_format($netProfit, 2) : 0),
 						"trend" => $netProfitTrend . " " .$display
 					];
 					$resultData[] = [
@@ -525,7 +525,7 @@ class Reports extends Pos {
 
 				$resultData[] = [
 					"column" => "total-sales",
-					"total" => $clientData->default_currency . number_format($totalSales, 2), 
+					"total" => $clientData->default_currency . (!empty($totalSales) ? number_format($totalSales, 2) : 0), 
 					"trend" => $totalSalesTrend ." ". $display
 				];
 				$resultData[] = [
@@ -535,17 +535,17 @@ class Reports extends Pos {
 				];
 				$resultData[] = [
 					"column" => "average-sales",
-					"total" => $clientData->default_currency . number_format($averageSalesValue, 2),
+					"total" => $clientData->default_currency . (!empty($averageSalesValue) ? number_format($averageSalesValue, 2) : 0),
 					"trend" => $averageSalesTrend ." ". $display
 				];
 				$resultData[] = [
 					"column" => "highest-sales",
-					"total" => $clientData->default_currency . number_format($highestSalesValue, 2),
+					"total" => $clientData->default_currency . (!empty($highestSalesValue) ? number_format($highestSalesValue, 2) : 0),
 					"trend" => $highestSalesTrend ." ". $display
 				];
 				$resultData[] = [
 					"column" => "order-discount",
-					"total" => $clientData->default_currency . number_format($orderDiscount, 2),
+					"total" => $clientData->default_currency . (!empty($orderDiscount) ? number_format($orderDiscount, 2) : 0),
 					"trend" => $orderDiscountTrend ." ". $display
 				];
 				
@@ -1431,11 +1431,11 @@ class Reports extends Pos {
 				//: branch summaries
 				while($result = $stmt->fetch(PDO::FETCH_OBJ)) {
 					$result->square_feet_sales = ($result->square_feet_area > 0) ? $clientData->default_currency.number_format(($result->total_sales / $result->square_feet_area), 2) : 0;
-					$result->lowest_sales = $clientData->default_currency.number_format($result->lowest_sales, 2);
+					$result->lowest_sales = $clientData->default_currency . (!empty($result->lowest_sales) ? number_format($result->lowest_sales, 2) : 0);
 					$result->average_sale_per_customer = $clientData->default_currency.(($result->total_sales > 0) ? number_format($result->total_sales/$result->customers_count, 2) : 0.00);
-					$result->highest_sales = $clientData->default_currency.number_format($result->highest_sales, 2);
-					$result->average_sales = $clientData->default_currency.number_format($result->average_sales, 2);
-					$result->total_sales = $clientData->default_currency.number_format($result->total_sales, 2);
+					$result->highest_sales = $clientData->default_currency . (!empty($result->highest_sales) ? number_format($result->highest_sales, 2) : 0);
+					$result->average_sales = $clientData->default_currency.(!empty($result->average_sales) ? number_format($result->average_sales, 2) : 0);
+					$result->total_sales = $clientData->default_currency . (!empty($result->total_sales) ? number_format($result->total_sales, 2) : 0);
 					
 					$summary[] = $result;
 				}

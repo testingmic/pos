@@ -3538,12 +3538,12 @@ $(function() {
         }
     }
 
-    var branchPerformance = (periodSelected = 'today') => {
+    var branchPerformance = (periodSelected = 'today', salesBranch = '') => {
         if ($(`table[class~="branch-overview"]`).length) {
             $.ajax({
                 type: "POST",
                 url: `${baseUrl}api/reportsAnalytics/generateReport`,
-                data: { generateReport: true, queryMetric: "branchPerformance", salesPeriod: periodSelected},
+                data: { generateReport: true, queryMetric: "branchPerformance", salesPeriod: periodSelected, salesBranch: salesBranch },
                 dataType: "JSON",
                 beforeSend: function() {
                 },
@@ -3556,11 +3556,11 @@ $(function() {
         }
     }
 
-    var summaryItems = (periodSelected = 'today') => {
+    var summaryItems = (periodSelected = 'today', salesBranch = '') => {
         $.ajax({
             type: "POST",
             url: `${baseUrl}api/reportsAnalytics/generateReport`,
-            data: { generateReport: true, queryMetric: "summaryItems", salesPeriod: periodSelected },
+            data: { generateReport: true, queryMetric: "summaryItems", salesPeriod: periodSelected, salesBranch: salesBranch },
             dataType: "JSON",
             beforeSend: function() {
                 sL();
@@ -3579,12 +3579,12 @@ $(function() {
         });
     }
 
-    var salesOverview = (periodSelected = 'today') => {
+    var salesOverview = (periodSelected = 'today', salesBranch = '') => {
 
         $.ajax({
             type: "POST",
             url: `${baseUrl}api/reportsAnalytics/generateReport`,
-            data: { generateReport: true, queryMetric: "salesOverview", salesPeriod: periodSelected },
+            data: { generateReport: true, queryMetric: "salesOverview", salesPeriod: periodSelected, salesBranch: salesBranch },
             dataType: "JSON",
             success: function(resp) {
 
@@ -4196,12 +4196,12 @@ $(function() {
         });
     }
 
-    var salesAttendantPerformance = (periodSelected = 'today') => {
+    var salesAttendantPerformance = (periodSelected = 'today', salesBranch = '') => {
         if ($(`div[id="attendant-performance"]`).length) {
             $.ajax({
                 type: "POST",
                 url: `${baseUrl}api/reportsAnalytics/generateReport`,
-                data: { generateReport: true, queryMetric: "salesAttendantPerformance", salesPeriod: periodSelected },
+                data: { generateReport: true, queryMetric: "salesAttendantPerformance", salesPeriod: periodSelected, salesBranch: salesBranch},
                 dataType: "JSON",
                 beforeSend: function() {
 
@@ -4219,13 +4219,13 @@ $(function() {
         }
     }
 
-    var topCustomersPerformance = (periodSelected = 'today') => {
+    var topCustomersPerformance = (periodSelected = 'today', salesBranch = '') => {
 
         if ($(`table[class~="custPerformance"]`).length) {
             $.ajax({
                 type: "POST",
                 url: `${baseUrl}api/reportsAnalytics/generateReport`,
-                data: { generateReport: true, queryMetric: "topCustomersPerformance", salesPeriod: periodSelected },
+                data: { generateReport: true, queryMetric: "topCustomersPerformance", salesPeriod: periodSelected, salesBranch: salesBranch },
                 dataType: "JSON",
                 beforeSend: function() {},
                 success: function(resp) {
@@ -4261,6 +4261,10 @@ $(function() {
 
         var period = $(`select[name="periodSelected"]`).val();
         var branch = $(`select[name="selected_branch"]`).val();
+
+        if(!$(`table[class~="salesLists"]`).length) {
+            return true;
+        }
 
         $.ajax({
             url: `${baseUrl}api/dashboardAnalytics/getSales`,
@@ -4771,25 +4775,27 @@ $(function() {
 
             } else if($(`div[class~="pos-reporting"]`).length) {
 
-                var period = $(`select[name="periodSelected"]`).val();
+                var thisPeriod = $(`select[name="periodSelected"]`).val();
+                var thisBranch = $(`select[name="selected_branch"]`).val();
 
                 if ($(`div[class~="reports-summary"]`).length) {
-                    summaryItems(period);
+                    summaryItems(thisPeriod, thisBranch);
                 }
 
-                salesOverview(period);
-                salesAttendantPerformance(period);
-                topCustomersPerformance(period);
-                branchPerformance(period);
+                salesOverview(thisPeriod, thisBranch);
+                salesAttendantPerformance(thisPeriod, thisBranch);
+                topCustomersPerformance(thisPeriod, thisBranch);
+                branchPerformance(thisPeriod, thisBranch);
 
                 $(`select[name="periodSelected"]`).on('change', function() {
                     sL();
                     var periodSelected = $(this).val();
-                    summaryItems(periodSelected);
-                    salesOverview(periodSelected);
-                    salesAttendantPerformance(periodSelected);
-                    topCustomersPerformance(periodSelected);
-                    branchPerformance(periodSelected);
+                    var newBranch = $(`select[name="selected_branch"]`).val();
+                    summaryItems(periodSelected, newBranch);
+                    salesOverview(periodSelected, newBranch);
+                    salesAttendantPerformance(periodSelected, newBranch);
+                    topCustomersPerformance(periodSelected, newBranch);
+                    branchPerformance(periodSelected, newBranch);
                 });
 
             }
@@ -4799,7 +4805,20 @@ $(function() {
             });
 
             $(`select[name="selected_branch"][id="selected_branch"]`).on('change', function() {
-                fetchSalesRecords();
+
+                let defaultPeriod = $(`select[name="periodSelected"]`).val();
+                let defaultBranch = $(`select[name="selected_branch"]`).val();
+
+                if($(`table[class~="salesLists"]`).length) {
+                    fetchSalesRecords();
+                }
+                else {
+                    summaryItems(defaultPeriod, defaultBranch);
+                    salesOverview(defaultPeriod, defaultBranch);
+                    salesAttendantPerformance(defaultPeriod, defaultBranch);
+                    topCustomersPerformance(defaultPeriod, defaultBranch);
+                    branchPerformance(defaultPeriod, defaultBranch);
+                }
             });
 
         }
