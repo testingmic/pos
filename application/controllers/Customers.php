@@ -205,7 +205,7 @@ class Customers extends Pos {
 				$response->message = "Please enter customer's name";
 			} elseif(!empty($postData->nc_email) && !filter_var($postData->nc_email, FILTER_VALIDATE_EMAIL)) {
 				$response->message = "Please enter a valid email address";
-			} elseif(!empty($postData->nc_contact) && !preg_match("/^[0-9+]+$/", $postData->nc_contact)) {
+			} elseif(!empty($postData->nc_contact) && !preg_match("/^\+\d{1,3}\s\(\d{3}\)\s\d{3}-\d{4}$/", $postData->nc_contact)) {
 				$response->message = "Please enter a valid contact number";
 			}
 			else{
@@ -213,11 +213,11 @@ class Customers extends Pos {
 				// set additioal variables
 				$postData->userId = $loggedUserId;
 				$postData->clientId = $loggedUserClientId;
-				$postData->branchId = (isset($postData->branchId)) ? $postData->branchId : $this->loggedUserBranchId;
-				$postData->nc_lastname = (isset($postData->nc_lastname)) ? $postData->nc_lastname : null;
-				$postData->nc_title = (isset($postData->nc_title)) ? $postData->nc_title : null;
-				$postData->residence = (isset($postData->residence)) ? $postData->residence : null;
-				$postData->n_contact2 = (isset($postData->phone_2)) ? $postData->phone_2 : null;
+				$postData->branchId = !empty($postData->branchId) ? $postData->branchId : $this->loggedUserBranchId;
+				$postData->nc_lastname = !empty($postData->nc_lastname) ? $postData->nc_lastname : null;
+				$postData->nc_title = !empty($postData->nc_title) ? $postData->nc_title : null;
+				$postData->residence = !empty($postData->residence) ? $postData->residence : null;
+				$postData->n_contact2 = !empty($postData->phone_2) ? $postData->phone_2 : null;
 				
 				// update the customer information
 				if($postData->request == "update-record") {

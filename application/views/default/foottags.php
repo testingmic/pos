@@ -1,4 +1,4 @@
-<?php $baseUrl = $config->base_url(); global $SITEURL, $clientData, $Notification, $accessObject; ?>
+<?php $baseUrl = $config->base_url(); global $SITEURL, $clientData, $Notification, $accessObject, $branchesList; ?>
 <!-- Footer -->
   <?php if(!confirm_url_id(0, 'point-of-sale')) { ?>
   <footer class="footer pt-0">
@@ -65,7 +65,20 @@
                           <label for="newCustomer_seccontact">Email Address</label>
                           <input placeholder="Email Address" type="text" class="form-control" name="nc_email" id="newCustomer_seccontact">
                         </div>
-                        <div class="form-group col-md-4">
+                        <?php if($accessObject->hasAccess('monitoring', 'branches')) { ?>
+                          <div class="form-group col-md-4">
+                            <label for="branchId">Branch</label>
+                            <select style="max-width: 400px" class="form-control selectpicker" name="branchId" id="branchId">
+                              <option value="">Select The Branch</option>
+                              <?php foreach($branchesList as $branch) {
+                                if(strtolower($branch->branch_type) !== 'store') continue;
+                                ?>
+                                <option value="<?= $branch->id ?>"><?= $branch->branch_name ?> (<?= $branch->location ?>)</option>
+                              <?php } ?>
+                            </select>
+                          </div>
+                        <?php } ?>
+                        <div class="form-group <?= $accessObject->hasAccess('monitoring', 'branches') ? 'col-md-12' : 'col-md-4' ?>">
                           <label for="newCustomer_residence">Place of Residence</label>
                           <input placeholder="Place of Residence" type="text" class="form-control" name="residence" id="newCustomer_residence">
                         </div>

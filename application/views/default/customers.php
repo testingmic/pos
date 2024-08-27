@@ -8,8 +8,13 @@ if($session->accountExpired) {
   show_error('Page Not Found', 'Sorry the page you are trying to view does not exist on this server');
     exit;
 }
+
 // include the important files
 require_once "headtags.php";
+
+// create some few objects
+global $branchesList;
+
 $session->insightRequest = [];
 ?>
 <!-- Page Content-->

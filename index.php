@@ -19,24 +19,16 @@ define('BASEPATH', $system_folder.DIRECTORY_SEPARATOR);
 define('APPPATH', $application_folder.DIRECTORY_SEPARATOR);
 define('VIEWPATH', $application_folder.DIRECTORY_SEPARATOR);
 
-function forceHttps() {
-	if($_SERVER["SERVER_PORT"] !==433 && (empty($_SERVER["HTTPS"]) || $_SERVER["HTTPS"]=="off")) {
-		// header("Location: https://dev.".$_SERVER["HTTP_HOST"].'.com'.$_SERVER["REQUEST_URI"]."");
-	}
-}
-
-forceHttps();
-
 /*
 	replace array indexes:
 	1) fix windows slashes
 	2) strip up-tree ../ as possible hack attempts
 */
-$URL = STR_REPLACE( ARRAY( '\\', '../'), ARRAY( '/',  '' ), $_SERVER['REQUEST_URI'] );
+$URL = str_replace( array( '\\', '../'), array( '/',  '' ), $_SERVER['REQUEST_URI'] );
 
 #strip all forms of get data
-IF ($offset = STRPOS($URL, '?')) { $URL = SUBSTR($URL, 0, $offset); } ELSE IF ($offset = STRPOS($URL, '#')) {
-	$URL = SUBSTR($URL, 0, $offset);
+IF ($offset = strpos($URL, '?')) { $URL = substr($URL, 0, $offset); } ELSE IF ($offset = strpos($URL, '#')) {
+	$URL = substr($URL, 0, $offset);
 }
 
 # call the main core function and start processing your document
@@ -48,25 +40,25 @@ REQUIRE "system/core/pos.php";
 	direct file access, they're also useful for moving uploads,
 	creating absolute URI's if needed, etc, etc
 */
-$chop = -STRLEN(BASENAME($_SERVER['SCRIPT_NAME']));
-define('DOC_ROOT', SUBSTR($_SERVER['SCRIPT_FILENAME'], 0, $chop));
-define('URL_ROOT', SUBSTR($_SERVER['SCRIPT_NAME'], 0, $chop));
+$chop = -strlen(basename($_SERVER['SCRIPT_NAME']));
+define('DOC_ROOT', substr($_SERVER['SCRIPT_FILENAME'], 0, $chop));
+define('URL_ROOT', substr($_SERVER['SCRIPT_NAME'], 0, $chop));
 
 # strip off the URL root from REQUEST_URI
-IF (URL_ROOT != '/') $URL = SUBSTR($URL, STRLEN(URL_ROOT));
+IF (URL_ROOT != '/') $URL = substr($URL, strlen(URL_ROOT));
 
 # strip off excess slashes
-$URL = TRIM($URL, '/');
+$URL = trim($URL, '/');
 
 # 404 if trying to call a real file
-IF ( FILE_EXISTS(DOC_ROOT.'/'.$URL) && ($_SERVER['SCRIPT_FILENAME'] != DOC_ROOT.$URL) && ($URL != '') && ($URL != 'Index.php') )
-	DIE(show_error('Page Not Found', 'Sorry the page you are trying to view does not exist on this server'));
+IF ( file_exists(DOC_ROOT.'/'.$URL) && ($_SERVER['SCRIPT_FILENAME'] != DOC_ROOT.$URL) && ($URL != '') && ($URL != 'Index.php') )
+	die(show_error('Page Not Found', 'Sorry the page you are trying to view does not exist on this server'));
 
 /*
 	If $url is empty of default value, set action to 'default'
 	otherwise, explode $URL into an array
 */
-$SITEURL = (($URL == '') || ($URL == 'index.php') || ($URL == 'index.html')) ? ARRAY('index') : EXPLODE('/', html_entity_decode($URL));
+$SITEURL = (($URL == '') || ($URL == 'index.php') || ($URL == 'index.html')) ? array('index') : EXPLODE('/', html_entity_decode($URL));
 
 /*
 	I strip out non word characters from $SITEURL[0] as the include
@@ -86,7 +78,7 @@ $accessObject = load_class('Accesslevel', 'controllers');
 $includeFile = config_item('default_view_path').strtolower(PREG_REPLACE('/[^\w_]-/','',$SITEURL[0])).'.php';
 
 # Check the site status
-GLOBAL $SITEURL, $session;
+global $SITEURL, $session;
 
 # Run some checks on the URL
 // set the dashboard main file
