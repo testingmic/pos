@@ -236,9 +236,9 @@ if(confirm_url_id(1)) {
         dataType: `json`,
         type: `POST`,
         success: function(resp) {
-          if(resp.count > 0) {
+          if(resp.message.count > 0) {
             var tData = ``;
-            $.each(resp.orderDetails, function(i, e) {
+            $.each(resp.message.orderDetails, function(i, e) {
               tData += `<tr data-content='${JSON.stringify(e)}' data-row="${e.order_id}">`;
               tData += `<td>${e.customer_fullname}<br>${e.customer_contact}</td>`;
               tData += `<td><strong data-toggle="tooltip" title="Click to return sale" data-return-id="${e.order_id}" class="cursor"><a href="${baseUrl}return/${e.order_id}" class="btn btn-sm btn-success">${e.order_id}</a></strong></td>`;

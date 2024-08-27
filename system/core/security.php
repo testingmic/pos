@@ -545,6 +545,7 @@ function _urldecodespaces($matches) {
 
 function xss_clean($str) {
 	
+	if(empty($str)) return $str;
 	// Remove Invisible Characters
 	// This prevents sandwiching null characters
 	// between ascii characters, like Java\0script.

@@ -108,18 +108,18 @@ class Handler extends Pos {
 		if($requestInfo === 'searchOrder') {
 				
 			//: order id
-			$orderId = xss_clean($_POST["orderId"]);
+			$orderId = xss_clean($_POST["orderId"] ?? null);
 
 			//: create a new object
 			$orderObj = load_class('Orders', 'controllers');
 
 			//: load the data
-			$data = $orderObj->saleDetails($orderId);
+			$data = !empty($_POST["orderId"]) ? $orderObj->saleDetails($orderId) : [];
 
 			$response = [
 				'orderId' => $orderId,
 				'orderDetails' => $data,
-				'count' => count($data)
+				'count' => !empty($data) ? 1 : 0
 			];
 
 		}

@@ -269,13 +269,13 @@ class Reports extends Pos {
 
 				$sales = $this->getAllRows(
 					"sales a LEFT JOIN customers b ON a.customer_id = b.customer_id", 
-					"a.order_discount, a.order_amount_paid, a.overall_order_amount, a.order_date, b.title, b.firstname, b.lastname, b.phone_1,
+					"a.order_discount, a.overall_order_amount, a.overall_order_amount, a.order_date, b.title, b.firstname, b.lastname, b.phone_1,
 						(
-							SELECT MAX(b.order_amount_paid) FROM sales b WHERE b.deleted='0' AND
+							SELECT MAX(b.overall_order_amount) FROM sales b WHERE b.deleted='0' AND
 							(DATE(b.order_date) >= '{$dateFrom}' && DATE(b.order_date) <= '{$dateTo}') {$this->branchAccessInner} {$this->accessLimitInner} {$this->customerLimitInner} {$this->clientAccessInner}
 						) AS highestSalesValue,
 						(
-							SELECT AVG(b.order_amount_paid) FROM sales b WHERE b.deleted='0' AND
+							SELECT AVG(b.overall_order_amount) FROM sales b WHERE b.deleted='0' AND
 							(DATE(b.order_date) >= '{$dateFrom}' && DATE(b.order_date) <= '{$dateTo}') {$this->branchAccessInner} {$this->accessLimitInner} {$this->customerLimitInner} {$this->clientAccessInner}
 						) AS averageSalesValue,
 						(
@@ -304,7 +304,7 @@ class Reports extends Pos {
 							WHERE b.status = '1' AND (DATE(b.start_date) >= '{$dateFrom}' AND DATE(b.start_date) <= '{$dateTo}') {$this->branchAccessInner} {$this->clientAccessInner}
 						) AS totalExpenditure,
 						(
-							SELECT SUM(b.order_amount_paid)/(SELECT COUNT(*) FROM users b WHERE b.status='1' && b.access_level NOT IN (1) {$this->clientAccessInner} {$this->branchAccessInner})
+							SELECT SUM(b.overall_order_amount)/(SELECT COUNT(*) FROM users b WHERE b.status='1' && b.access_level NOT IN (1) {$this->clientAccessInner} {$this->branchAccessInner})
 							FROM sales b WHERE b.deleted='0' AND (DATE(b.order_date) >= '{$dateFrom}' AND DATE(b.order_date) <= '{$dateTo}') {$this->branchAccessInner} {$this->clientAccessInner} {$this->accessLimit}
 						) AS salesPerEmployee
 					", 
@@ -322,7 +322,7 @@ class Reports extends Pos {
 
 						$orderDate = date('jS F Y', strtotime($data->order_date));
 
-						$totalSales += $data->order_amount_paid;
+						$totalSales += $data->overall_order_amount;
 						$totalServed += 1;
 						$productQuantity = $data->productQuantity;
 						$orderDiscount += $data->order_discount;
@@ -380,14 +380,14 @@ class Reports extends Pos {
 				$prevSales = $this->getAllRows(
 					"sales a", 
 					"
-						COUNT(*) AS totalPrevServed, CASE WHEN SUM(a.order_amount_paid) IS NULL THEN 1 ELSE SUM(a.order_amount_paid) END AS totalPrevSales, SUM(a.order_discount) AS total_order_discount, SUM(a.overall_order_amount) AS totalRevenue,
+						COUNT(*) AS totalPrevServed, CASE WHEN SUM(a.overall_order_amount) IS NULL THEN 1 ELSE SUM(a.overall_order_amount) END AS totalPrevSales, SUM(a.order_discount) AS total_order_discount, SUM(a.overall_order_amount) AS totalRevenue,
 						(
-							SELECT MAX(b.order_amount_paid) FROM sales b WHERE b.deleted='0' AND
+							SELECT MAX(b.overall_order_amount) FROM sales b WHERE b.deleted='0' AND
 							(DATE(b.order_date) >= '{$datePrevFrom}' && DATE(b.order_date) <= '{$datePrevTo}') {$this->branchAccessInner} {$this->customerLimitInner}
 							{$this->accessLimitInner} {$this->clientAccessInner}
 						) AS highestSalesValue,
 						(
-							SELECT AVG(b.order_amount_paid) FROM sales b WHERE b.deleted='0' AND
+							SELECT AVG(b.overall_order_amount) FROM sales b WHERE b.deleted='0' AND
 							(DATE(b.order_date) >= '{$datePrevFrom}' && DATE(b.order_date) <= '{$datePrevTo}') {$this->branchAccessInner} {$this->customerLimitInner}
 							{$this->accessLimitInner} {$this->clientAccessInner}
 						) AS averageSalesValue,
@@ -418,7 +418,7 @@ class Reports extends Pos {
 							FROM products b WHERE status='1'
 						) AS productQuantity,
 						(
-							SELECT SUM(b.order_amount_paid)/(SELECT COUNT(*) FROM users b WHERE b.status='1' && b.access_level NOT IN (1) {$this->clientAccessInner} {$this->branchAccessInner})
+							SELECT SUM(b.overall_order_amount)/(SELECT COUNT(*) FROM users b WHERE b.status='1' && b.access_level NOT IN (1) {$this->clientAccessInner} {$this->branchAccessInner})
 							FROM sales b WHERE b.deleted='0' AND (DATE(b.order_date) >= '{$datePrevFrom}' AND DATE(b.order_date) <= '{$datePrevTo}') {$this->branchAccessInner} {$this->clientAccessInner} {$this->accessLimit}
 						) AS salesPerEmployee
 					", 
@@ -569,9 +569,10 @@ class Reports extends Pos {
 					// using the foreach loop to fetch the records
 					foreach ($opts as $eachOption) {
 						$queryData = $this->getAllRows(
-							"sales a", "CASE WHEN SUM(a.order_amount_paid) IS NULL THEN 0.1 ELSE SUM(a.order_amount_paid) END AS total_amount, a.payment_type",
-							"a.payment_type = '".strtolower($eachOption)."' && a.deleted='0' && a.order_status='confirmed' && (DATE(a.order_date) >= '{$dateFrom}' && DATE(a.order_date) <= '{$dateTo}') {$branchAccess} {$this->accessLimit} {$clientAccess}
-							"
+							"sales a", "CASE WHEN SUM(a.overall_order_amount) IS NULL THEN 0.1 ELSE SUM(a.overall_order_amount) END AS total_amount, a.payment_type",
+							"a.payment_type = '".strtolower($eachOption)."' && a.deleted='0' && a.order_status='confirmed' && (
+								DATE(a.order_date) >= '{$dateFrom}' && DATE(a.order_date) <= '{$dateTo}'
+							) {$branchAccess} {$this->accessLimit} {$clientAccess}"
 						);
 						
 						$paymentData = $queryData[0];
@@ -790,7 +791,7 @@ class Reports extends Pos {
 				// get the list of all sales returns
 				$sales_list = $this->db->prepare("
 					SELECT 
-						SUM(a.order_amount_paid) AS amount_discounted,
+						SUM(a.overall_order_amount) AS amount_discounted,
 						SUM(a.overall_order_amount) AS amount_not_discounted, 
 						DATE(a.order_date) AS dates,
 						HOUR(a.order_date) AS hourOfDay,
@@ -816,7 +817,7 @@ class Reports extends Pos {
 							{$this->branchAccessInner} {$this->accessLimitInner} {$this->clientAccessInner} {$this->customerLimitInner}
 						) AS unique_customers,
 						(
-							SELECT CASE WHEN SUM(b.order_amount_paid) IS NULL THEN 0.00 ELSE SUM(b.order_amount_paid) END
+							SELECT CASE WHEN SUM(b.overall_order_amount) IS NULL THEN 0.00 ELSE SUM(b.overall_order_amount) END
 							FROM sales b
 							WHERE b.payment_type='credit' AND b.order_status='confirmed' AND  
 							($groupBy(b.order_date) = $groupBy(a.order_date)) AND b.deleted='0' 
@@ -824,7 +825,7 @@ class Reports extends Pos {
 							{$this->branchAccessInner} {$this->accessLimitInner} {$this->clientAccessInner} {$this->customerLimitInner} 
 						) AS total_credit_sales,
 						(
-							SELECT CASE WHEN SUM(b.order_amount_paid) IS NULL THEN 0.00 ELSE SUM(b.order_amount_paid) END 
+							SELECT CASE WHEN SUM(b.overall_order_amount) IS NULL THEN 0.00 ELSE SUM(b.overall_order_amount) END 
 							FROM sales b
 							WHERE b.payment_type != 'credit' AND b.order_status='confirmed' AND  
 							($groupBy(b.order_date) = $groupBy(a.order_date)) AND b.deleted='0'
@@ -1109,7 +1110,7 @@ class Reports extends Pos {
 					// run this query
 					$salesAttendants = $this->getAllRows(
 						"sales a LEFT JOIN customers b ON b.customer_id=a.customer_id",
-						"a.payment_type, a.order_amount_paid, DATE(a.order_date) AS order_date, 
+						"a.payment_type, a.overall_order_amount, DATE(a.order_date) AS order_date, 
 						a.order_id, b.customer_id, b.phone_1, b.email, b.title, 
 						a.payment_type, CONCAT(b.firstname, ' ', b.lastname) AS fullname, a.credit_sales
 						",
@@ -1125,7 +1126,7 @@ class Reports extends Pos {
 						
 						$i++;
 						$eachSale->order_date = $eachSale->order_date;
-						$eachSale->totalOrder = $eachSale->order_amount_paid;
+						$eachSale->totalOrder = $eachSale->overall_order_amount;
 
 						if($rawJSON) {
 							$eachSale->saleDetails = $ordersObj->saleDetails($eachSale->order_id, $this->clientId, $this->loggedUserBranchId, $this->loggedUserId);
@@ -1133,12 +1134,20 @@ class Reports extends Pos {
 						} else {
 							$resultData[] = [
 								'row' => $i,
-								'order_id' => "<a onclick=\"return getSalesDetails('{$eachSale->order_id}')\" data-toggle=\"tooltip\" title=\"View Trasaction Details\" href=\"javascript:void(0)\" type=\"button\" class=\"get-sales-details text-success\" data-sales-id=\"{$eachSale->order_id}\">#$eachSale->order_id</a> <br> ".ucfirst($eachSale->payment_type),
+								'order_id' => "<a onclick=\"return getSalesDetails('{$eachSale->order_id}')\" data-toggle=\"tooltip\" 
+									title=\"View Trasaction Details\" href=\"javascript:void(0)\" type=\"button\" class=\"get-sales-details text-success\" 
+									data-sales-id=\"{$eachSale->order_id}\">#$eachSale->order_id</a> <br> ".ucfirst($eachSale->payment_type),
 								'fullname' => "<a href=\"{$config->base_url('customer-detail/'.$eachSale->customer_id)}\">{$eachSale->title} {$eachSale->fullname}</a>",
 								'phone' => $eachSale->phone_1,
 								'date' => $eachSale->order_date,
 								'amount' => "{$clientData->default_currency} {$eachSale->totalOrder}",
-								'action' => "<a title=\"Print Transaction Details\" href=\"javascript:void(0);\" class=\"btn btn-sm btn-outline-primary print-receipt\" data-sales-id=\"{$eachSale->order_id}\"><i class=\"fa fa-print\"></i></a> <a data-toggle=\"tooltip\" title=\"Email the Receipt\" href=\"javascript:void(0)\" class=\"btn-outline-info btn btn-sm resend-email\" data-email=\"{$eachSale->email}\" data-name=\"{$eachSale->title} {$eachSale->fullname}\" data-customer-id=\"{$eachSale->customer_id}\" data-sales-id=\"{$eachSale->order_id}\"><i class=\"fa fa-envelope\"></i></a> <a data-toggle=\"tooltip\" title=\"Download Trasaction Details\" href=\"{$config->base_url('export/'.$eachSale->order_id)}\" target=\"_blank\" class=\"btn-outline-success btn btn-sm get-sales-details\" data-sales-id=\"{$eachSale->order_id}\"><i class=\"fa fa-download\"></i></a>",
+								'action' => "<a title=\"Print Transaction Details\" href=\"javascript:void(0);\" class=\"btn btn-sm btn-outline-primary print-receipt\" 
+									data-sales-id=\"{$eachSale->order_id}\"><i class=\"fa fa-print\"></i></a> <a data-toggle=\"tooltip\" title=\"Email the Receipt\" 
+									href=\"javascript:void(0)\" class=\"btn-outline-info btn btn-sm resend-email\" data-email=\"{$eachSale->email}\" 
+									data-name=\"{$eachSale->title} {$eachSale->fullname}\" data-customer-id=\"{$eachSale->customer_id}\" data-sales-id=\"{$eachSale->order_id}\">
+										<i class=\"fa fa-envelope\"></i></a> <a data-toggle=\"tooltip\" title=\"Download Trasaction Details\" 
+											href=\"{$config->base_url('export/'.$eachSale->order_id)}\" target=\"_blank\" class=\"btn-outline-success btn btn-sm get-sales-details\" 
+											data-sales-id=\"{$eachSale->order_id}\"><i class=\"fa fa-download\"></i></a>",
 							];
 						}
 
@@ -1160,7 +1169,7 @@ class Reports extends Pos {
 						CONCAT(a.name) AS fullname,
 						(
 							SELECT 
-								CASE WHEN SUM(b.order_amount_paid) IS NULL THEN 0.00 ELSE SUM(b.order_amount_paid) END 
+								CASE WHEN SUM(b.overall_order_amount) IS NULL THEN 0.00 ELSE SUM(b.overall_order_amount) END 
 							FROM sales b 
 							WHERE 
 								b.recorded_by=a.user_id AND b.order_status='confirmed' AND b.deleted='0' AND
@@ -1199,7 +1208,8 @@ class Reports extends Pos {
 						$personnelNames[] = $eachPersonnel->fullname;
 						$personnelSales[] = $eachPersonnel->amnt;
 
-						$uName = "<div class='text-left'><a data-name=\"{$eachPersonnel->fullname}\" data-record=\"attendant\" data-value=\"{$eachPersonnel->user_id}\" class=\"view-user-sales font-weight-bold\" href='javascript:void(0)'>{$eachPersonnel->fullname}</a></div>";
+						$uName = "<div class='text-left'><a data-name=\"{$eachPersonnel->fullname}\" data-record=\"attendant\" 
+							data-value=\"{$eachPersonnel->user_id}\" class=\"view-user-sales font-weight-bold\" href='javascript:void(0)'>{$eachPersonnel->fullname}</a></div>";
 
 						if($period == "today") {
 							$salesTarget = $eachPersonnel->daily_target;
@@ -1218,7 +1228,9 @@ class Reports extends Pos {
 							'sales' => [
 								'orders' => $eachPersonnel->orders,
 								'amount' => $clientData->default_currency.number_format($eachPersonnel->amnt, 2),
-								'average_sale' => ($eachPersonnel->orders > 0) ? $clientData->default_currency.number_format(($eachPersonnel->amnt/$eachPersonnel->orders), 2) : $clientData->default_currency."0.00"
+								'average_sale' => ($eachPersonnel->orders > 0) ? $clientData->default_currency.number_format(
+									($eachPersonnel->amnt/$eachPersonnel->orders), 2
+								) : $clientData->default_currency."0.00"
 							],
 							'items' => [
 								'total_items_sold' => (int) $eachPersonnel->total_items_sold,
@@ -1252,7 +1264,7 @@ class Reports extends Pos {
 							a.phone_1, a.phone_2, a.email, 
 							(
 							    SELECT 
-							    	CASE WHEN SUM(b.order_amount_paid) IS NULL THEN 0.00 ELSE SUM(b.order_amount_paid) END
+							    	CASE WHEN SUM(b.overall_order_amount) IS NULL THEN 0.00 ELSE SUM(b.overall_order_amount) END
 							   	FROM
 							    	sales b
 							    WHERE
@@ -1310,9 +1322,14 @@ class Reports extends Pos {
 							if($result->total_amount > 0) {
 								$row++;
 								$result->row_id = $row;
-								$result->fullname = "<a href=\"{$config->base_url('customer-detail/'.$result->customer_id)}\" title=\"Click to list customer orders history\" data-value=\"{$result->customer_id}\" class=\"customer-orders\" data-name=\"{$result->customer_name}\">{$result->customer_name}</a>";
+								$result->fullname = "<a href=\"{$config->base_url('customer-detail/'.$result->customer_id)}\" title=\"Click to list customer orders history\" 
+									data-value=\"{$result->customer_id}\" class=\"customer-orders\" data-name=\"{$result->customer_name}\">{$result->customer_name}</a>";
 
-								$result->action = "<a href=\"javascript:void(0);\" title=\"Click to list customer orders history\" data-name=\"{$result->customer_name}\" data-record=\"customer\" data-value=\"{$result->customer_id}\" class=\"view-user-sales btn btn-sm btn-outline-success\"><i class=\"fa fa-list\"></i></a> <a href=\"{$config->base_url('customer-detail/'.$result->customer_id)}\" title=\"Click to list customer orders history\" data-name=\"{$result->customer_name}\" data-record=\"customer\" data-value=\"{$result->customer_id}\" class=\"btn btn-sm btn-outline-primary\"><i class=\"fa fa-chart-bar\"></i></a>";
+								$result->action = "<a href=\"javascript:void(0);\" title=\"Click to list customer orders history\" data-name=\"{$result->customer_name}\" 
+									data-record=\"customer\" data-value=\"{$result->customer_id}\" class=\"view-user-sales btn btn-sm btn-outline-success\">
+									<i class=\"fa fa-list\"></i></a> <a href=\"{$config->base_url('customer-detail/'.$result->customer_id)}\" 
+										title=\"Click to list customer orders history\" data-name=\"{$result->customer_name}\" data-record=\"customer\" 
+										data-value=\"{$result->customer_id}\" class=\"btn btn-sm btn-outline-primary\"><i class=\"fa fa-chart-bar\"></i></a>";
 								// calculate the average purchase amount
 								$result->average_purchase = "{$clientData->default_currency} ".(($result->total_amount > 0) ? number_format(($result->total_amount/$result->orders_count),2) : 0);
 								$result->total_amount = "{$clientData->default_currency} ".number_format($result->total_amount, 2);
@@ -1342,7 +1359,7 @@ class Reports extends Pos {
 						) AS orders_count,
 						(
 							SELECT 
-								ROUND(SUM(b.order_amount_paid) ,2) 
+								ROUND(SUM(b.overall_order_amount) ,2) 
 							FROM sales b
 							WHERE b.branchId = a.id AND b.deleted='0'
 								AND (DATE(b.order_date) >= '{$dateFrom}' && DATE(b.order_date) <= '{$dateTo}') AND order_status='confirmed'
@@ -1350,7 +1367,7 @@ class Reports extends Pos {
 						) AS total_sales,
 						(
 							SELECT 
-								ROUND(MAX(b.order_amount_paid) ,2)
+								ROUND(MAX(b.overall_order_amount) ,2)
 							FROM sales b
 							WHERE b.branchId = a.id AND b.deleted='0' 
 								AND (DATE(b.order_date) >= '{$dateFrom}' && DATE(b.order_date) <= '{$dateTo}') AND order_status='confirmed'
@@ -1358,7 +1375,7 @@ class Reports extends Pos {
 						) AS highest_sales,
 						(
 							SELECT 
-								ROUND(MIN(b.order_amount_paid) ,2) 
+								ROUND(MIN(b.overall_order_amount) ,2) 
 							FROM sales b
 							WHERE b.branchId = a.id AND b.deleted='0'
 								AND (DATE(b.order_date) >= '{$dateFrom}' && DATE(b.order_date) <= '{$dateTo}') AND order_status='confirmed'
@@ -1366,7 +1383,7 @@ class Reports extends Pos {
 						) AS lowest_sales,
 						(
 							SELECT 
-								ROUND(AVG(b.order_amount_paid) ,2)
+								ROUND(AVG(b.overall_order_amount) ,2)
 							FROM sales b
 							WHERE b.branchId = a.id AND b.deleted='0'
 								AND (DATE(b.order_date) >= '{$dateFrom}' && DATE(b.order_date) <= '{$dateTo}') AND order_status='confirmed'
@@ -1389,7 +1406,7 @@ class Reports extends Pos {
 				//: fetch the other totals
 				$chart_stmt = $this->db->prepare("
 					SELECT 
-						SUM(a.order_amount_paid) AS amount, 
+						SUM(a.overall_order_amount) AS amount, 
 						DATE(a.order_date) AS dates,
 						HOUR(a.order_date) AS hourOfDay,
 						MONTH(a.order_date) AS monthOfSale
@@ -1573,16 +1590,16 @@ class Reports extends Pos {
 				"a.*, b.title, b.firstname, b.lastname, b.phone_1,
 				b.email,
 					(
-						SELECT MAX(b.order_amount_paid) FROM sales b WHERE b.deleted='0' AND 
+						SELECT MAX(b.overall_order_amount) FROM sales b WHERE b.deleted='0' AND 
 						(DATE(b.order_date) >= '{$dateFrom}' && DATE(b.order_date) <= '{$dateTo}') {$this->branchAccessInner} {$this->accessLimitInner} {$this->customerLimitInner} {$this->clientAccessInner}
 					) AS highestSalesValue,
 					(
-						SELECT SUM(b.order_amount_paid) FROM sales b WHERE b.deleted='0' AND
+						SELECT SUM(b.overall_order_amount) FROM sales b WHERE b.deleted='0' AND
 						credit_sales = '1' AND 
 						(DATE(b.order_date) >= '{$dateFrom}' && DATE(b.order_date) <= '{$dateTo}') {$this->branchAccessInner} {$this->accessLimitInner} {$this->customerLimitInner} {$this->clientAccessInner}
 					) AS totalCreditSales,
 					(
-						SELECT AVG(b.order_amount_paid) FROM sales b WHERE b.deleted='0' AND
+						SELECT AVG(b.overall_order_amount) FROM sales b WHERE b.deleted='0' AND
 						(DATE(b.order_date) >= '{$dateFrom}' && DATE(b.order_date) <= '{$dateTo}') {$this->branchAccessInner} {$this->accessLimitInner} {$this->customerLimitInner} {$this->clientAccessInner}
 					) AS averageSalesValue,
 					(
@@ -1625,7 +1642,7 @@ class Reports extends Pos {
 
 					// format the order date
 					$orderDate = date('jS F Y h:iA', strtotime($data->order_date));
-					$totalOrder= $this->toDecimal($data->order_amount_paid, 2, ',');
+					$totalOrder= $this->toDecimal($data->overall_order_amount, 2, ',');
 
 					if($rawJSON) {
 						$results[] = [
@@ -1662,7 +1679,7 @@ class Reports extends Pos {
 					$totalCostPrice += $data->totalCostPrice;
 					$totalSellingPrice += $data->totalSellingPrice;
 					$totalProfit += $data->totalProfitMade;
-					$totalSales += $data->order_amount_paid;
+					$totalSales += $data->overall_order_amount;
 					$totalServed += 1;
 					$creditTotalProfitMade += $data->creditTotalProfitMade;
 					
@@ -1683,21 +1700,21 @@ class Reports extends Pos {
 				$prevSales = $this->getAllRows(
 					"sales a", 
 					"
-						COUNT(*) AS totalPrevServed, SUM(a.order_amount_paid) AS totalPrevSales,
+						COUNT(*) AS totalPrevServed, SUM(a.overall_order_amount) AS totalPrevSales,
 						SUM(a.order_discount) AS totalDiscountGiven,
 						(
-							SELECT MAX(b.order_amount_paid) FROM sales b WHERE b.deleted = '0' &&
+							SELECT MAX(b.overall_order_amount) FROM sales b WHERE b.deleted = '0' &&
 							(DATE(b.order_date) >= '{$datePrevFrom}' && DATE(b.order_date) <= '{$datePrevTo}') {$this->branchAccessInner} {$this->customerLimitInner}
 							{$this->accessLimitInner} {$this->clientAccessInner}
 						) AS highestSalesValue,
 						(
-							SELECT SUM(b.order_amount_paid) FROM sales b WHERE
+							SELECT SUM(b.overall_order_amount) FROM sales b WHERE
 							 b.deleted = '0' &&
 							credit_sales = '1' AND
 							(DATE(b.order_date) >= '{$datePrevFrom}' && DATE(b.order_date) <= '{$datePrevTo}') {$this->branchAccessInner} {$this->accessLimitInner} {$this->customerLimitInner} {$this->clientAccessInner}
 						) AS totalPrevCreditSales,
 						(
-							SELECT AVG(b.order_amount_paid) FROM sales b WHERE 
+							SELECT AVG(b.overall_order_amount) FROM sales b WHERE 
 							 b.deleted = '0' &&
 							(DATE(b.order_date) >= '{$datePrevFrom}' && DATE(b.order_date) <= '{$datePrevTo}') {$this->branchAccessInner} {$this->customerLimitInner}
 							{$this->accessLimitInner} {$this->clientAccessInner}

@@ -80,7 +80,7 @@ class Orders extends Pos {
 		$amountPayable = ($amountPayable - $orderDiscount);
 
 		// calculate the balance
-		$totalBalance = ($register->payment_type != self::PAYMENT_CREDIT) ? ($register->amount_paying-$amountPayable) : ($overallOrderTotal-$orderDiscount);
+		$totalBalance = ($register->payment_type != self::PAYMENT_CREDIT) ? ($register->amount_paying - $amountPayable) : ($overallOrderTotal-$orderDiscount);
 
 		//: set the revert sale value
 		$revertSale = in_array($register->payment_type, [self::PAYMENT_CARD, self::PAYMENT_MOMO]) ? 1 : 0;
@@ -99,7 +99,7 @@ class Orders extends Pos {
 			'{$register->customer}',
 			'{$computed->currentUser}',
 			'{$computed->creditSales}',
-			'{$amountPayable}',
+			'{$register->amount_paying}',
 			'{$orderDiscount}',
 			'{$computed->orderStatus}',
 			'{$overallOrderTotal}',
@@ -168,6 +168,7 @@ class Orders extends Pos {
 	}
 
 	public function saleDetails($orderId, $clientId = null, $branchId = null, $userId = null) {
+		
 		// global variables
 		global $accessObject;
 
