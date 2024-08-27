@@ -29,7 +29,7 @@ class Reports extends Pos {
      * 
      * @param object $clientData
      */
-    public function setVariables($clientData) {
+    public function setVariables($clientData, $postData = []) {
 
         $this->clientId = $clientData->clientId;
 
@@ -58,6 +58,12 @@ class Reports extends Pos {
             $this->accessLimitInner2 = " AND c.recorded_by = '{$this->loggedUserId}'";
             $this->branchAccessInner = " AND b.branchId = '{$this->loggedUserBranchId}'";
         }
+
+		if(!empty($postData['salesBranch'])) {
+			$this->loggedUserBranchId = (int)$postData['salesBranch'];
+			$this->branchAccess2 = " AND a.branch_id = '{$this->loggedUserBranchId}'";
+            $this->branchAccessInner = " AND b.branchId = '{$this->loggedUserBranchId}'";
+		}
         
     }
 
@@ -72,7 +78,7 @@ class Reports extends Pos {
      */
     public function reportsAnalytics($clientData, $setupInfo, $expiredAccount) {
 
-        $this->setVariables($clientData);
+        $this->setVariables($clientData, $_POST);
 
         global $config;
 
@@ -87,6 +93,8 @@ class Reports extends Pos {
         if(!$this->accessObject->hasAccess('monitoring', 'branches')) {
             $branchAccess = " AND a.branchId = '{$this->loggedUserBranchId}'";
         }
+
+		$this->branchAccessInner = " AND b.branchId = '{$this->loggedUserBranchId}'";
 
 		$resultData = [];
 		$metric = "unknown";
@@ -104,8 +112,9 @@ class Reports extends Pos {
 
 			// check parsed
 			$postData = (Object) array_map('xss_clean', $_POST);
-			$period = (isset($postData->salesPeriod)) ? strtolower($postData->salesPeriod) : "today";
-			$metric = (isset($postData->queryMetric)) ? $postData->queryMetric : null;
+			$period = isset($postData->salesPeriod) ? strtolower($postData->salesPeriod) : "today";
+			$metric = isset($postData->queryMetric) ? $postData->queryMetric : null;
+			$branch = isset($postData->salesBranch) ? $postData->salesBranch : null;
 			$productLimit = ((!empty($postData->productsLimit)) ? (int) $postData->productsLimit : (!empty($this->session->productsLimit) ? $this->session->productsLimit : $productLimit));
 			$customerListLimit = (isset($postData->customersLimit)) ? $postData->customersLimit : 30;
 
@@ -115,6 +124,12 @@ class Reports extends Pos {
 			// set the range in a session
 			if(isset($postData->salesPeriod)) {
 				$this->session->set_userdata("reportPeriod", $period);
+			}
+
+			// set the range in a session
+			if(isset($postData->salesBranch)) {
+				$this->session->set_userdata("reportBranch", $branch);
+				$branchAccess = " AND a.branchId = '{$postData->salesBranch}'";
 			}
 
 			// alpha filters
@@ -1473,7 +1488,7 @@ class Reports extends Pos {
     public function dashboardAnalytics($clientData, $setupInfo, $expiredAccount, $requestInfo) {
 
         // set the client data variable information
-        $this->setVariables($clientData);
+        $this->setVariables($clientData, $_POST);
 
         global $config;
 
@@ -1494,9 +1509,18 @@ class Reports extends Pos {
 
         if ($requestInfo === "getSales") {
 
-			$period = (isset($_POST['salesPeriod'])) ? xss_clean($_POST['salesPeriod']) : "today";
+			$period = isset($_POST['salesPeriod']) ? xss_clean($_POST['salesPeriod']) : "today";
+			$branchId = !empty($_POST['salesBranch']) ? $_POST['salesBranch'] : null;
 
 			$this->session->set_userdata("reportPeriod", $period);
+			
+			// set the range in a session
+			if(!empty($branchId)) {
+				$this->session->set_userdata("reportBranch", $branchId);
+				$branchAccess = " AND a.branchId = '{$branchId}'";
+			} else {
+				$this->session->set_userdata("reportBranch", null);
+			}
 
 			$period = ($expiredAccount) ? "this-week" : $period;
 

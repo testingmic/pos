@@ -4,6 +4,8 @@ $PAGETITLE = "Sales History";
 // include the important files
 require_once "headtags.php";
 
+global $branchesList;
+
 $session->limitedData = true;
 $session->insightRequest = false;
 ?>
@@ -30,13 +32,31 @@ $session->insightRequest = false;
   
   <div class="row">
       
-      <div class="col-lg-9 col-mb-8"></div>
-      <div class="col-lg-3 col-mb-4 mb-2">
-          <select class="form-control selectpicker" name="periodSelected">
-              <?php foreach($filterPeriod as $key => $value) { ?>
-              <option <?= ($session->reportPeriod == $key) ? "selected" : null ?> value="<?= $key ?>"><?= $value ?></option>
-              <?php } ?>
-          </select>
+      <div class="col-md-6"></div>
+      <style>
+        .select2-container .select2-selection--single {
+          line-height: 2.5;
+          height: 54px;
+        }
+      </style>
+      <div class="col-md-3 mb-2">
+        <select style="max-width: 400px" class="form-control selectpicker" name="selected_branch" id="selected_branch">
+          <option value="">Select Branch</option>
+          <?php foreach($branchesList as $branch) {
+            if(strtolower($branch->branch_type) !== 'store') continue;
+            ?>
+            <option <?= $session->reportBranch == $branch->id ? "selected" : null; ?> value="<?= $branch->id ?>">
+              <?= $branch->branch_name ?> (<?= $branch->location ?>)
+            </option>
+          <?php } ?>
+        </select>
+      </div>
+      <div class="col-md-3 mb-2">
+        <select class="form-control selectpicker" name="periodSelected">
+            <?php foreach($filterPeriod as $key => $value) { ?>
+            <option <?= ($session->reportPeriod == $key) ? "selected" : null ?> value="<?= $key ?>"><?= $value ?></option>
+            <?php } ?>
+        </select>
       </div> <!--end col-->
       <div class="col-lg-1 mb-2 hidden">
           <button class="btn btn-block btn-primary"><i class="fa fa-filter"></i></button>

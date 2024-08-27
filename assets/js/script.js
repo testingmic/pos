@@ -624,8 +624,10 @@ var changeDefaultBranch = () => {
     }, 'json')
 }
 
-var setSelectedPointOfSale = () => {
-    let branchId = $(`select[name="branch_selector"][id="branch_selector"]`).val();
+var setSelectedPointOfSale = (branchId = '') => {
+    if(!branchId) {
+        branchId = $(`select[name="branch_selector"][id="branch_selector"]`).val();
+    }
     if(!branchId.length) {
         Toast.fire({
             type: 'error',
@@ -645,6 +647,13 @@ var setSelectedPointOfSale = () => {
         }
     }, 'json')
 }
+
+$(`select[name="auto_select_branch"]`).on('change', function() {
+    let branchId = $(this).val();
+    if(branchId.length) {
+        setSelectedPointOfSale(branchId);
+    }
+});
 
 if ($(`table[class~="productsList"]`).length) {
 
@@ -4251,12 +4260,13 @@ $(function() {
         var colspan = "7";
 
         var period = $(`select[name="periodSelected"]`).val();
+        var branch = $(`select[name="selected_branch"]`).val();
 
         $.ajax({
             url: `${baseUrl}api/dashboardAnalytics/getSales`,
             type: "POST",
             dataType: "json",
-            data: { getSales: true, salesPeriod: period },
+            data: { getSales: true, salesPeriod: period, salesBranch: branch },
             beforeSend: function() {},
             success: function(data) {
 
@@ -4785,6 +4795,10 @@ $(function() {
             }
 
             $(`select[name="periodSelected"]`).on('change', function() {
+                fetchSalesRecords();
+            });
+
+            $(`select[name="selected_branch"][id="selected_branch"]`).on('change', function() {
                 fetchSalesRecords();
             });
 
