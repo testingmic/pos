@@ -4761,18 +4761,18 @@ $(function() {
             $(`div[class~="offline-placeholder"]`).css({ 'display': 'none' });
             $(`div[class~="offline-placeholder"] button[type="button"]`).prop('disabled', false);
 
+            var thisPeriod = $(`select[name="periodSelected"]`).val();
+            var thisBranch = $(`select[name="selected_branch"]`).val();
+
             if ($(`div[class~="dashboard-reports"], div[class~="overallSalesHistory"]`).length) {
                 fetchSalesRecords();
-                salesAttendantPerformance(period);
+                salesAttendantPerformance(thisPeriod, thisBranch);
 
                 if($(`div[class~="sales-overview-data"]`).length) {
-                    salesOverview('this-week');
+                    salesOverview('this-week', thisBranch);
                 }
 
             } else if($(`div[class~="pos-reporting"]`).length) {
-
-                var thisPeriod = $(`select[name="periodSelected"]`).val();
-                var thisBranch = $(`select[name="selected_branch"]`).val();
 
                 if ($(`div[class~="reports-summary"]`).length) {
                     summaryItems(thisPeriod, thisBranch);
