@@ -704,6 +704,94 @@ class Pos {
 
     }
 
+	/**
+	 * Handle the branches display
+	 * 
+	 * @param array $branchesList
+	 * @param array $branchAccess
+	 * @param object $session
+	 * 
+	 * @return string	
+	 */
+	public function handleBranchesDisplay($branchesList, $branchAccess, $session, $marginTop = '') {
+		$output = '';
+
+		if (count($branchAccess) > 1) {
+			$output .= '
+			<style>
+			  .select2-container .select2-selection--single {
+				line-height: 2.5;
+				height: 54px;
+			  }
+			</style>
+			<div class="col-md-9 text-center mb-2 '.$marginTop.'">
+			  <div class="alert alert-success">
+				Note that this sale will be recorded under the branch: 
+				<strong class="text-uppercase">"' . 
+					(!empty($session->selectedSingleBranch) ? htmlspecialchars($branchesList[$session->selectedSingleBranch]->branch_name ?? "") : 'No Branch Selected')
+				. '"</strong> set as the default sales branch.
+				<span onclick="return changeDefaultBranch()" class="cursor text-underline" title="Click to change branch">Do you wish to change it?</span>
+			  </div>
+			</div>
+			<div class="col-md-3 mb-2 '.$marginTop.'">
+			  <select style="max-width: 400px" class="form-control selectpicker" name="auto_select_branch" id="auto_select_branch">';
+
+			foreach ($branchesList as $branch) {
+				if (strtolower($branch->branch_type) !== 'store') continue;
+				$selected = $session->selectedSingleBranch == $branch->id ? "selected" : "";
+				$output .= '
+				  <option ' . $selected . ' value="' . htmlspecialchars($branch->id) . '">
+					' . htmlspecialchars($branch->branch_name) . ' (' . htmlspecialchars($branch->location) . ')
+				  </option>';
+			}
+
+			$output .= '
+			  </select>
+			</div>';
+		}
+		
+		return $output;
+	}
+
+	/**
+	 * Handle the branch select
+	 * 
+	 * @param array $branchesList
+	 * @param object $clientData
+	 * @param object $session
+	 * 
+	 * @return string		
+	 */
+	public function handleBranchSelect($branchesList, $clientData) {
+
+		$output = '
+		<div class="col-lg-12">
+			<div class="card">
+				<div class="card-body text-center">
+					<div class="alert alert-warning">
+						You have access to more than one Point of Sale. Kindly select a branch to proceed with the sale.
+					</div>
+					<div class="text-center">
+						<select style="max-width: 400px" class="form-control selectpicker" name="branch_selector" id="branch_selector">
+							<option value="">Select The Branch To Load</option>';
+							foreach ($branchesList as $branch) {
+								if (strtolower($branch->branch_type) !== 'store') continue;
+								$output .= '<option value="' . htmlspecialchars($branch->id) . '">' . htmlspecialchars($branch->branch_name) . ' (' . htmlspecialchars($branch->location) . ')</option>';
+							}
+							
+							$output .= '
+						</select>
+						<div class="mt-3">
+							<button onclick="return setSelectedPointOfSale()" class="btn ' . htmlspecialchars($clientData->btn_outline) . '">Proceed to Point of Sale</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>';
+
+		return $output;
+	}
+
 
     public function daysDiff($startDate, $endDate) {
 

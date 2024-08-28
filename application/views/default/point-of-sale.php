@@ -77,55 +77,9 @@ a[href="#finish"] {
   
   <div class="row">
       <?php if($selectBranchRequired) { ?>
-        <div class="col-lg-12">
-          <div class="card">
-            <div class="card-body text-center">
-              <div class="alert alert-warning">
-                You have access to more than one Point of Sale, Kindly select a branch to proceed with the sale.
-              </div>
-              <div class="text-center">
-                <select style="max-width: 400px" class="form-control selectpicker" name="branch_selector" id="branch_selector">
-                  <option value="">Select The Branch To Load</option>
-                  <?php foreach($branchesList as $branch) {
-                    if(strtolower($branch->branch_type) !== 'store') continue;
-                    ?>
-                    <option value="<?= $branch->id ?>"><?= $branch->branch_name ?> (<?= $branch->location ?>)</option>
-                  <?php } ?>
-                </select>
-                <div class="mt-3">
-                  <button onclick="return setSelectedPointOfSale()" class="btn <?= $clientData->btn_outline; ?>">Proceed to Point of Sale</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <?= $posClass->handleBranchSelect($branchesList, $clientData); ?>
       <?php } else { ?>
-        <?php if(count($branchAccess) > 1) { ?>
-          <style>
-            .select2-container .select2-selection--single {
-              line-height: 2.5;
-              height: 54px;
-            }
-          </style>
-          <div class="col-md-9 text-center mb-2">
-            <div class="alert alert-success">
-              Note that this sale will be recorded under the branch: 
-              <strong class="text-uppercase">"<?= $branchesList[$session->selectedSingleBranch]->branch_name; ?>"</strong> set as the default sales branch.
-              <span onclick="return changeDefaultBranch()" class="cursor text-underline" title="Click to change branch">Do you wish to change it?</span>
-            </div>
-          </div>
-          <div class="col-md-3 mb-2">
-            <select style="max-width: 400px" class="form-control selectpicker" name="auto_select_branch" id="auto_select_branch">
-              <?php foreach($branchesList as $branch) {
-                if(strtolower($branch->branch_type) !== 'store') continue;
-                ?>
-                <option <?= $session->selectedSingleBranch == $branch->id ? "selected" : null; ?> value="<?= $branch->id ?>">
-                  <?= $branch->branch_name ?> (<?= $branch->location ?>)
-                </option>
-              <?php } ?>
-            </select>
-          </div>
-        <?php } ?>
+        <?= $posClass->handleBranchesDisplay($branchesList, $branchAccess, $session); ?>
         <div class="col-lg-6">
           <div class="card">
             <?= (!$validDate) ? nonWorkingDay() : null; ?>

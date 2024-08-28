@@ -17,7 +17,7 @@ if($session->accountExpired) {
     exit;
 }
 
-global $accessObject;
+global $accessObject, $branchesList;
 
 // create a new object for the access level
 $accessObject->userId = $session->userId;
@@ -46,9 +46,9 @@ require_once "headtags.php";
           </nav>
         </div>
         <?php if(!$session->accountExpired) { ?>
-        <div class="col-lg-6 col-5 text-right">
-          <a href="<?= $config->base_url("requests/".substr(strtolower($PAGETITLE), 0, -1)); ?>" class="btn btn-sm btn-neutral"><i class="fa fa-plus"></i> New Quote</a>
-        </div>
+          <div class="col-lg-6 col-5 text-right">
+            <a href="<?= $config->base_url("requests/".substr(strtolower($PAGETITLE), 0, -1)); ?>" class="btn btn-sm btn-neutral"><i class="fa fa-plus"></i> New Quote</a>
+          </div>
         <?php } ?>
       </div>
     </div>

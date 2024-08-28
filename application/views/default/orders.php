@@ -17,7 +17,7 @@ if($session->accountExpired) {
     exit;
 }
 
-global $accessObject;
+global $accessObject, $branchesList;
 
 // create a new object for the access level
 $accessObject->userId = $session->userId;
