@@ -6,8 +6,10 @@ $application_folder = "application";
 #display errors
 error_reporting(E_ALL);
 
-// display the erros
-ini_set("display_errors", 1);
+if($_SERVER['HTTP_HOST'] == "localhost") {
+	// display the errors
+	ini_set("display_errors", 1);
+}
 
 #set new places for my error recordings
 ini_set("log_errors","1");
