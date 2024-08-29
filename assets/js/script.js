@@ -3599,7 +3599,7 @@ $(function() {
                 }
 
                 if(typeof resp.result.sales.products_performance !== 'undefined') {
-                populateProductsPerformance(resp.result.sales.products_performance);
+                    populateProductsPerformance(resp.result.sales.products_performance);
                 }
 
                 if ($("#sales-overview-chart").length) {
@@ -4283,8 +4283,9 @@ $(function() {
                             {"data":'order_id'},
                             {"data":'fullname'},
                             {"data":'phone'},
-                            {"data":'date'},
                             {"data":'amount'},
+                            {"data":'recorded_by'},
+                            {"data":'date'},
                             {"data":'action'}
                         ]
                     });

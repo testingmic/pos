@@ -224,7 +224,7 @@ if($setupInfo->type == "alpha") {
                   </li>
                   <?php } ?>
                   <?php if($accessObject->hasAccess('view', 'orders')) { ?>
-                  <li class="nav-item">
+                  <li class="nav-item hidden">
                     <a href="<?= $baseUrl ?>orders" class="nav-link blur-content shortcut-offline">Orders</a>
                   </li>
                   <?php } ?>

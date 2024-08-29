@@ -73,8 +73,9 @@ $session->insightRequest = false;
                               <th>Transaction ID</th>
                               <th>Customer</th>
                               <th>Contact</th>
-                              <th>Date</th>
                               <th>Sales Value</th>
+                              <th>Recorded By</th>
+                              <th>Date</th>
                               <th></th>
                           </tr>
                       </thead>

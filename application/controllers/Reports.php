@@ -1586,8 +1586,10 @@ class Reports extends Pos {
 			$creditTotalDiscountGiven = 0;
 
 			$sales = $this->getAllRows(
-				"sales a LEFT JOIN customers b ON a.customer_id = b.customer_id", 
-				"a.*, b.title, b.firstname, b.lastname, b.phone_1,
+				"sales a LEFT JOIN customers b ON a.customer_id = b.customer_id
+				LEFT JOIN users u ON u.user_id = a.recorded_by", 
+				"a.*, u.name AS recorded_by, u.phone AS recorded_by_phone, u.email AS recorded_by_email,
+				b.title, b.firstname, b.lastname, b.phone_1,
 				b.email,
 					(
 						SELECT MAX(b.overall_order_amount) FROM sales b WHERE b.deleted='0' AND 
@@ -1664,6 +1666,7 @@ class Reports extends Pos {
 							'phone' => $data->phone_1,
 							'date' => $orderDate,
 							'amount' => "{$clientData->default_currency} {$totalOrder}",
+							'recorded_by' => $data->recorded_by,
 							'action' => "<a title=\"Print Transaction Details\" href=\"javascript:void(0);\" class=\"btn btn-sm btn-outline-primary print-receipt\" 
                                 data-sales-id=\"{$data->order_id}\"><i class=\"fa fa-print\"></i></a> <a data-toggle=\"tooltip\" title=\"Email the Receipt\" 
                                 href=\"javascript:void(0)\" class=\"btn-outline-info btn btn-sm resend-email\" data-email=\"{$data->email}\" 

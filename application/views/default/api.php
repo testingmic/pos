@@ -277,11 +277,11 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 				$response = $requestData;
 			}
 
-			if(isset($requestData['data'])) {
+			if(is_array($requestData) && !empty($requestData['data'])) {
 				$response['data'] = $requestData['data'];
 			}
 
-			if(isset($requestData->data)) {
+			if(!is_array($requestData) && isset($requestData->data)) {
 				$response->data = $requestData->data;
 			}
 			
