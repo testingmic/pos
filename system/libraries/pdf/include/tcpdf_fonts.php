@@ -1741,7 +1741,7 @@ class TCPDF_FONTS {
 	 * @since 2.1.000 (2008-01-08)
 	 * @public static
 	 */
-	public static function arrUTF8ToUTF16BE($unicode, $setbom=false) {
+	public static function arrUTF8ToUTF16BE($unicode, $setbom) {
 		$outstr = ''; // string to be returned
 		if ($setbom) {
 			$outstr .= "\xFE\xFF"; // Byte Order Mark (BOM)
@@ -1775,7 +1775,7 @@ class TCPDF_FONTS {
 	 * @since 4.5.037 (2009-04-07)
 	 * @public static
 	 */
-	public static function UTF8ArrayToUniArray($ta, $isunicode=true) {
+	public static function UTF8ArrayToUniArray($ta, $isunicode) {
 		if ($isunicode) {
 			return array_map(array('TCPDF_FONTS', 'unichrUnicode'), $ta);
 		}
@@ -1994,7 +1994,7 @@ class TCPDF_FONTS {
 	 * @author Nicola Asuni
 	 * @public static
 	 */
-	public static function UTF8StringToArray($str, $isunicode=true, &$currentfont) {
+	public static function UTF8StringToArray($str, $isunicode, &$currentfont) {
 		if ($isunicode) {
 			// requires PCRE unicode support turned on
 			$chars = TCPDF_STATIC::pregSplit('//','u', $str, -1, PREG_SPLIT_NO_EMPTY);
@@ -2020,7 +2020,7 @@ class TCPDF_FONTS {
 	 * @since 3.2.000 (2008-06-23)
 	 * @public static
 	 */
-	public static function UTF8ToLatin1($str, $isunicode=true, &$currentfont) {
+	public static function UTF8ToLatin1($str, $isunicode, &$currentfont) {
 		$unicode = self::UTF8StringToArray($str, $isunicode, $currentfont); // array containing UTF-8 unicode values
 		return self::UTF8ArrToLatin1($unicode);
 	}
@@ -2036,7 +2036,7 @@ class TCPDF_FONTS {
 	 * @since 1.53.0.TC005 (2005-01-05)
 	 * @public static
 	 */
-	public static function UTF8ToUTF16BE($str, $setbom=false, $isunicode=true, &$currentfont) {
+	public static function UTF8ToUTF16BE($str, $setbom, $isunicode, &$currentfont) {
 		if (!$isunicode) {
 			return $str; // string is not in unicode
 		}
@@ -2056,7 +2056,7 @@ class TCPDF_FONTS {
 	 * @since 2.1.000 (2008-01-08)
 	 * @public static
 	 */
-	public static function utf8StrRev($str, $setbom=false, $forcertl=false, $isunicode=true, &$currentfont) {
+	public static function utf8StrRev($str, $setbom, $forcertl, $isunicode, &$currentfont) {
 		return self::utf8StrArrRev(self::UTF8StringToArray($str, $isunicode, $currentfont), $str, $setbom, $forcertl, $isunicode, $currentfont);
 	}
 
@@ -2073,7 +2073,7 @@ class TCPDF_FONTS {
 	 * @since 4.9.000 (2010-03-27)
 	 * @public static
 	 */
-	public static function utf8StrArrRev($arr, $str='', $setbom=false, $forcertl=false, $isunicode=true, &$currentfont) {
+	public static function utf8StrArrRev($arr, $str, $setbom, $forcertl, $isunicode, &$currentfont) {
 		return self::arrUTF8ToUTF16BE(self::utf8Bidi($arr, $str, $forcertl, $isunicode, $currentfont), $setbom);
 	}
 
@@ -2089,7 +2089,7 @@ class TCPDF_FONTS {
 	 * @since 2.4.000 (2008-03-06)
 	 * @public static
 	 */
-	public static function utf8Bidi($ta, $str='', $forcertl=false, $isunicode=true, &$currentfont) {
+	public static function utf8Bidi($ta, $str, $forcertl, $isunicode, &$currentfont) {
 		// paragraph embedding level
 		$pel = 0;
 		// max level

@@ -82,11 +82,7 @@ if(!empty($result)) {
 	set_time_limit(0);
 	ini_set('memory_limit', '-1');
 	// call the header file
-	load_file(
-		array(
-			'tcpdf_include'=>'libraries/pdf'
-		)
-	);
+	load_file(['tcpdf_include'=>'libraries/pdf']);
 	$format = "pdf";
 	// ---------------------------------------------------------
 	error_reporting(0);
@@ -270,14 +266,19 @@ if(!empty($result)) {
 
 	// print $invoice_data;
 	// exit;
+	
+	$pdfPath = ROOTPATH . "/assets/pdf/";
+	if(!is_dir($pdfPath)) {
+		mkdir($pdfPath, 0755, true);
+	}
+
 	// create new PDF document
 	$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
-	// print_r(DOC_ROOT."");exit;
 	// confirm that the format should be in pdf
 	if(in_array($format, array("pdf"))) {
-		
-		$file_name = strtolower("C:\\xampp\htdocs\\pos\\assets\\pdfs\\invoice_$sales_id");
+
+		$file_name = "{$pdfPath}invoice_{$sales_id}";
 
 		// set document information
 		$pdf->SetCreator(PDF_CREATOR);
@@ -286,8 +287,10 @@ if(!empty($result)) {
 		$pdf->SetSubject('Point of Sale Receipt');
 		$pdf->SetKeywords('cms, sales, invoice, pos');
 
+		// print ROOTPATH . '/assets/images/logo.png'; exit;
+
 		// set default header data
-		$pdf->SetHeaderData('C:\\xampp\htdocs\\pos\\assets\\images\\logo.png', PDF_HEADER_LOGO_WIDTH, $clientData->client_name, "Phone: " .$clientData->primary_contact."\nEmail: ".$clientData->client_email."\nWebsite: ".$clientData->client_website);
+		$pdf->SetHeaderData(ROOTPATH . '/assets/images/logo.png', PDF_HEADER_LOGO_WIDTH, $clientData->client_name, "Phone: " .$clientData->primary_contact."\nEmail: ".$clientData->client_email."\nWebsite: ".$clientData->client_website);
 
 		// set header and footer fonts
 		$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
@@ -321,9 +324,6 @@ if(!empty($result)) {
 
 		// output the HTML content
 		$pdf->writeHTML($invoice_data, false, false, true, false, '');
-		
-		//print $report_data;
-		// instantiate and use the dompdf class
 		
 		//Close and output PDF document
 		$pdf->Output($file_name.".pdf", 'I');
