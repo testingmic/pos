@@ -51,7 +51,7 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 
 	// set the combined request payload
 	$combinedRequestPayload = [
-		"inventoryManagement", "userManagement", "customerManagement", "branchManagment", 
+		"inventoryManagement", "userManagement", "customerManagement", "branchManagment", "manageQuotes",
 		"categoryManagement", "expensesManagement", "pointOfSaleProcessor", "returnOrderProcessor",
 		"notificationHandler", "deleteData", "fetchCustomersOptionsList", "fetchPOSProductsList", "importManager"
 	];
@@ -104,88 +104,9 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 	//: MOVE INTO THIS ENTIRE SECTION IF THE ACCOUNT HAS NOT YET EXPIRED
 	elseif(!$expiredAccount) {
 
-		//: Quotes / Requests
-		if(isset($_POST["listRequests"], $_POST["requestType"]) && confirm_url_id(1, 'listRequests')) {
-			// assign variable to remove
-			$postData = (Object) array_map('xss_clean', $_POST);
-
-			// check the access levels
-			if($accessObject->hasAccess('view', 'branches')) {
-				// list all quotes
-				$accessLevelClause = "AND rq.branchId = '{$loggedUserBranchId}'"; 
-			}
-
-			// query the database
-			$result = $posClass->getAllRows(
-				"requests rq 
-					LEFT JOIN customers ct ON ct.customer_id = rq.customer_id
-					LEFT JOIN users us ON us.user_id = rq.recorded_by
-					LEFT JOIN branches bc ON bc.id = rq.branchId
-				", 
-				"rq.id, rq.branchId, rq.request_id, rq.customer_id, rq.currency, 
-					CASE WHEN rq.request_discount IS NULL THEN rq.request_total ELSE (rq.request_total-rq.request_discount) END AS request_sum, rq.request_date, bc.branch_name, rq.request_type,
-					rq.recorded_by, CONCAT(ct.firstname, ' ', ct.lastname) AS customer_name,
-					us.name AS recorded_by
-				", 
-				"rq.deleted = '0' {$accessLevelClause} AND 
-					rq.clientId = '{$loggedUserClientId}' AND rq.request_type = '{$postData->requestType}' ORDER BY rq.id DESC LIMIT {$limit}"
-			);
-
-			// initializing
-			$row = 0;
-			$results = [];
-
-			$ordersObj = load_class('Orders', 'controllers');
-
-			// loop through the list of items
-			foreach($result as $eachRequest) {
-				// configure the
-				$row++;
-
-				if($rawJSON) {
-					$eachRequest->itemLines = $ordersObj->requestDetails($eachRequest->request_id, $loggedUserClientId, $loggedUserBranchId, $loggedUserId);
-					unset($eachRequest->id);
-					$results[] = $eachRequest;
-				} else {
-
-					$eachRequest->action = "<div align=\"center\">";
-		        
-			        $eachRequest->action .= "<a class=\"btn btn-sm btn-outline-primary\" title=\"Export the {$eachRequest->request_type} to PDF\" data-value=\"{$eachRequest->request_id}\" href=\"".$config->base_url('export/'.$eachRequest->request_id)."\" target=\"_blank\"><i class=\"fa fa-file-pdf\"></i> </a> &nbsp;";
-
-			        // check if the user has access to delete this item
-			        if($accessObject->hasAccess('delete', strtolower($eachRequest->request_type.'s'))) {
-			        	// print the delete button
-			        	$eachRequest->action .= "<a class=\"btn btn-sm delete-item btn-outline-danger\" data-msg=\"Are you sure you want to delete this {$eachRequest->request_type}\" data-request=\"{$eachRequest->request_type}\" data-url=\"{$config->base_url('api/deleteData')}\" data-id=\"{$eachRequest->request_id}\" href=\"javascript:void(0)\"><i class=\"fa fa-trash\"></i> </a>";
-			        }
-
-			        $eachRequest->action .= "</div>";
-
-					// append to the list of items
-					$results[] = [
-						'row_id' => $row,
-						'request_type' => $eachRequest->request_type,
-						'request_id' => "<a target=\"_blank\" class=\"text-success\" title=\"Click to view full details\" href=\"{$config->base_url('export/'.$eachRequest->request_id)}\">{$eachRequest->request_id}</a>",
-						'branch_name' => $eachRequest->branch_name,
-						'customer_name' => $eachRequest->customer_name,
-						'quote_value' => "{$clientData->default_currency} ". number_format($eachRequest->request_sum, 2),
-						'recorded_by' => $eachRequest->recorded_by,
-						'request_date' => $eachRequest->request_date,
-						'action' => $eachRequest->action
-					];
-				}
-			}
-
-			$response = [
-				'status' => 200,
-				'result' => $results,
-				'rows_count' => count($result)
-			];
-
-		}
-
 		//: Process requests
 		//: Submit to cart for processing
-		elseif(isset($_POST['selectedProducts'], $_POST["request"], $_POST["customerId"], $_POST["discountType"], $_POST["discountAmt"]) && confirm_url_id(1, 'pushRequest')) {
+		if(isset($_POST['selectedProducts'], $_POST["request"], $_POST["customerId"], $_POST["discountType"], $_POST["discountAmt"]) && confirm_url_id(1, 'pushRequest')) {
 			// #initializing
 			$data = "";
 			$status = 500;
@@ -249,6 +170,7 @@ if($admin_user->logged_InControlled() || isset($apiAccessValues->clientId)) {
 				"expensesManagement" => "Expenses",
 				"branchManagment" => "Branches",
 				"userManagement" => "Users",
+				"manageQuotes" => "Quotes",
 				"returnOrderProcessor" => "Handler",
 				"notificationHandler" => "Handler",
 				"deleteData" => "Handler",

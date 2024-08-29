@@ -1506,9 +1506,6 @@ class Reports extends Pos {
 
         global $config;
 
-        //: if the request is from an api request then push only json raw data
-	    $rawJSON = isset($this->apiAccessValues->branchId) ? true : false;
-
         //: where clause for the user role
         $branchAccess = '';
         $clientAccess = " AND a.clientId = '{$this->clientId}'";

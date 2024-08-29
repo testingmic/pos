@@ -962,12 +962,12 @@ async function listRequests(requestType, tableName) {
 
     $.ajax({
         method: "POST",
-        url: `${baseUrl}api/listRequests`,
+        url: `${baseUrl}api/manageQuotes/listRequests`,
         data: { listRequests: "true", requestType: requestType },
         dataType: "JSON",
         beforeSend: function() {},
         success: function(resp) {
-            popReqLst(resp.result, `${tableName}`);
+            popReqLst(resp.message, `${tableName}`);
         },
         complete: function(data) {
             inpCont();
