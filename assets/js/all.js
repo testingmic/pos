@@ -850,7 +850,7 @@ $(`div[class="main-content"]`).on('click', `a[class~="logout"]`, async function(
 
     $.ajax({
         type: "POST",
-        url: `${baseUrl}al/dLg`,
+        url: `${baseUrl}auth_api/dLg`,
         data: {doLogout: true, toPerform: toPerform},
         dataType: "json",
         success: function(e) {

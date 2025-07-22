@@ -56,7 +56,7 @@ if($admin_user->logged_InControlled()) {
               <div class="text-center text-muted mb-4">
                 <small>Sign in with credentials</small>
               </div>
-              <form autocomplete="Off" action="<?= $config->base_url('al/dL') ?>" class="sF">
+              <form autocomplete="Off" action="<?= $config->base_url('api/dL') ?>" class="sF">
                 <div class="form-group mb-3">
                   <div class="input-group input-group-merge input-group-alternative">
                     <div class="input-group-prepend">

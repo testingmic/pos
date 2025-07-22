@@ -154,7 +154,6 @@ elseif(confirm_url_id(1, "doResetPassword") && isset($_POST["reset-password"])) 
 	}
 }
 
-//: Update 
 // set the response data
 $responseData = [
 	'status' => $status,
