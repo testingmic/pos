@@ -76,7 +76,7 @@ class Authenticate {
 
         global $pos, $config;
 
-        $user_agent = load_class('user_agent', 'libraries');
+        $user_agent = load_class('User_agent', 'libraries');
 
         try {
 
@@ -169,7 +169,7 @@ class Authenticate {
 
         global $pos, $config;
 
-        $user_agent = load_class('user_agent', 'libraries');
+        $user_agent = load_class('User_agent', 'libraries');
 
         try {
 
