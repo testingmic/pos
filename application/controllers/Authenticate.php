@@ -16,8 +16,7 @@ class Authenticate {
 
             $stmt = $pos->prepare("
                 SELECT * FROM users
-                WHERE
-                    (login='$username' OR email='$username') AND status='1'
+                WHERE (login='{$username}' OR email='{$username}') AND status='1'
             ");
             $stmt->execute();
 

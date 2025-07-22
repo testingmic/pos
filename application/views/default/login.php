@@ -78,7 +78,6 @@ if($admin_user->logged_InControlled()) {
                 </div>
                 <div><strong>Admin: </strong>testadmin@mail.com | TestPass123</div>
                 <div><strong>User: </strong>vendoraccount@mail.com | TestPass123</div>
-                <div><strong>User: </strong>salesmanager@mail.com | TestPass123</div>
               </form>
               <div class="form-result text-center"></div>
             </div>
