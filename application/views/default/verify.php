@@ -19,7 +19,7 @@ $rootDir = $config->base_url();
   <link rel="icon" href="<?= $rootDir; ?>assets/img/brand/favicon.png" type="image/png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
   <link rel="stylesheet" href="<?= $rootDir; ?>assets/vendor/nucleo/css/nucleo.css" type="text/css">
-  <link rel="stylesheet" href="<?= $rootDir; ?>assets/vendor/%40fortawesome/fontawesome-free/css/all.min.css" type="text/css">
+  <link rel="stylesheet" href="<?= $rootDir; ?>assets/vendor/fortawesome/fontawesome-free/css/all.min.css" type="text/css">
   <link rel="stylesheet" href="<?= $rootDir; ?>assets/css/argon.min9f1e.css?v=1.1.0" type="text/css">
   <script src="<?= $rootDir; ?>assets/vendor/jquery/dist/jquery.min.js"></script>
 </head>
