@@ -18,7 +18,7 @@ class Notifications extends Pos {
 	public $notice = null;
 	public $message = null;
 	public $hasExpired = false;
-	public $clientInfo;
+	public $clientInfo = null;
 	public $setupInfo;
 	public $themeColors;
 

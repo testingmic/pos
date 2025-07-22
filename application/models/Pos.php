@@ -108,7 +108,7 @@ class Pos {
 	 * 
 	 * @param string|null		$clientId
 	 * 
-	 * @return array
+	 * @return mixed
 	 */
 	public function clientData($clientId = null) {
 		$clientId = (!empty($clientId)) ? $clientId : $this->clientId;
