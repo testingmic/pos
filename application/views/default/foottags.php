@@ -252,7 +252,7 @@
 <?php if(in_array($SITEURL[0], ["settings"])) { ?>
 <script src="<?= $baseUrl ?>assets/vendor/summernote/summernote-bs4.min.js"></script>
 <?php } ?>
-<script type="text/javascript"><?php if(in_array($SITEURL[0], ["point-of"])) { ?>Cookies.set("sidenav-state", "unpinned");<?php } else { ?>Cookies.set("sidenav-state", "pinned");<?php } ?></script>
+<script type="text/javascript">Cookies.set("sidenav-state", "pinned");</script>
 <script src="<?= $baseUrl ?>assets/js/datepicker.min.js"></script>
 <script src="<?= $baseUrl ?>assets/js/argon.min9f1e.js"></script>
 <script src="<?= $baseUrl ?>assets/vendor/sweetalert2/dist/sweetalert2.min.js"></script>

@@ -171,7 +171,7 @@ if($setupInfo->type == "alpha") {
     <?php } ?>
   </style>
 </head>
-<body>
+<body class="g-sidenav-show g-sidenav-pinned">
   <div class="connection"><div class="connection-lost">Connection lost. Changes will be synced once it is restored. <i class="fa fa-spinner fa-spin"></i><div class="internet-check" data-internet-up="0"></div></div></div><div class="connection"><div class="connection-restored">Your connection is restored, refreshing content <i class="fa fa-spin fa-spinner"></i><div class="internet-check" data-internet-up="0"></div></div></div>
   <nav class="sidenav navbar navbar-vertical fixed-left navbar-expand-xs navbar-light bg-white" id="sidenav-main">
     <div class="scrollbar-inner">
