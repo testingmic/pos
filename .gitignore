@@ -2,6 +2,7 @@ application/sessions
 !application/sessions/index.html
 .DS_Store
 .htaccess
+error_log
 system/config/config.php
 system/config/constants.php
 db.ini
