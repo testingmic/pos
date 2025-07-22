@@ -3,14 +3,16 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 // set thee default date/time for the php.ini to use
-date_default_timezone_set('Europe/Lisbon');
+date_default_timezone_set('UTC');
+
+$ini = parse_ini_file("db.ini");
 
 # set the constants for the database connection
 defined('ENVIRONMENT') OR define('ENVIRONMENT', 'development');
-defined('DB_HOST')  OR define('DB_HOST', "127.0.0.1");
-defined('DB_USER')  OR define('DB_USER', "root");
-defined('DB_PASS')  OR define('DB_PASS', "");
-defined('DB_NAME')  OR define('DB_NAME', "pos");
+defined('DB_HOST')  OR define('DB_HOST', $ini['hostname']);
+defined('DB_USER')  OR define('DB_USER', $ini['username']);
+defined('DB_PASS')  OR define('DB_PASS', $ini['password']);
+defined('DB_NAME')  OR define('DB_NAME', $ini['database']);
 
 define('TIME_PERIOD', 60);
 define('ATTEMPTS_NUMBER', 7);

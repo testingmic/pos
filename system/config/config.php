@@ -12,14 +12,16 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-$config['base_url'] = 'http://localhost/argon';
-$config['manager_dashboard'] = 'http://localhost/argon/app';
+$ini = parse_ini_file("db.ini");
+
+$config['base_url'] = $ini['base_url'];
+$config['manager_dashboard'] = $ini['base_url'] . '/app';
 $config['rowsperpage'] = 40;
 $config['version'] = 'v1';
 $config['site_url'] = 'https://www.emmallextech.com';
 $config['site_name'] = 'Argon POS';
 $config['site_email'] = 'info@emmallextech.com';
-$config['developer'] = 'Emmallex Technologies';
+$config['developer'] = 'Springbits';
 $config['update_folder'] = '/analitica/company/backups/';
 $config['sionoff'] = 'Off';
 $config['index_page'] = 'index.php';

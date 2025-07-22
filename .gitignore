@@ -4,3 +4,4 @@ application/sessions
 .htaccess
 system/config/config.php
 system/config/constants.php
+db.ini
